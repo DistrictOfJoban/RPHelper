@@ -1,0 +1,8 @@
+{
+  "gui.jbrph.rpupdate.title": "Resource Pack Update",
+  "gui.jbrph.rpdownload.title": "Downloading Resource Pack",
+  "gui.jbrph.rpdownload.generic": "%s > Please wait...",
+  "gui.jbrph.rpdownload.percentage": "%s > %f%% done.",
+  "gui.jbrph.rpupdate.failed": "Failed: %s",
+  "gui.jbrph.rpupdate.uptodate": "%s up to date!"
+}

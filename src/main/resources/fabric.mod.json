@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "jbrph",
+  "version": "${version}",
+
+  "name": "Joban Resource Pack Helper",
+  "description": "Download and update resource pack easier.",
+  "authors": [
+    "LX86"
+  ],
+  "contact": {
+    "homepage": "",
+    "sources": "https://github.com/DistrictOfJoban/JobanRPHelper"
+  },
+
+  "license": "MIT",
+  "icon": "assets/jbrph/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.lx862.jbrph.RPHelper"
+    ],
+    "client": [
+      "com.lx862.jbrph.RPHelperClient"
+    ]
+  },
+  "mixins": [
+    "jbrph.mixin.json"
+  ],
+  "depends": {
+    "minecraft": ">=1.19"
+  }
+}
