@@ -3,6 +3,7 @@ package com.lx862.jbrph.data.manager;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.lx862.jbrph.RPHelperClient;
 import com.lx862.jbrph.config.Config;
 import com.lx862.jbrph.data.PackEntry;
 import net.minecraft.client.MinecraftClient;
@@ -32,18 +33,25 @@ public class ServerLockManager {
     }
 
     private static void refreshRepository(boolean dontReload, boolean forced) {
+        refreshServerLockList();
+        MinecraftClient mc = MinecraftClient.getInstance();
         boolean packChanged = false;
 
+        // MC is not ready
+        if(mc.options == null) return;
+
         for(PackEntry packEntry : Config.getPackEntries()) {
-            if(!PackManager.isPackReady(packEntry)) return;
+            if(!PackManager.isPackReady(packEntry)) {
+                return;
+            }
 
             String packName = "file/" + packEntry.fileName;
-            MinecraftClient mc = MinecraftClient.getInstance();
             ServerInfo currentServerEntry = mc.getCurrentServerEntry();
+            String[] serverLock = serverLocks.get(packEntry.uniqueId());
 
             boolean serverMatched = false;
-            if(currentServerEntry != null) {
-                serverMatched = Arrays.asList(PackManager.ALLOWED_IPS).contains(currentServerEntry.address);
+            if(currentServerEntry != null && serverLock != null) {
+                serverMatched = Arrays.asList(serverLock).contains(currentServerEntry.address);
             }
 
             boolean packShouldBeActive = mc.world == null || serverMatched;
@@ -71,9 +79,7 @@ public class ServerLockManager {
         }
     }
 
-    // TODO: Unused atm, idk does this work, bit annoying to test
     public static void refreshServerLockList() {
-
         Collection<ResourcePackProfile> profiles = MinecraftClient.getInstance().getResourcePackManager().getProfiles();
         for(ResourcePackProfile resourcePackProfile : profiles) {
             PackEntry thisPackEntry = Config.getPackEntry(resourcePackProfile.getName());
@@ -87,7 +93,7 @@ public class ServerLockManager {
                 if(!(rp instanceof AbstractFileResourcePack frp)) continue;
 
                 try (InputStream is = frp.openRoot("pack.mcmeta")) {
-                    if(is == null) return;
+                    if(is == null) continue;
 
                     String str = IOUtils.toString(is, StandardCharsets.UTF_8);
                     JsonObject jsonObject = JsonParser.parseString(str).getAsJsonObject().get("pack").getAsJsonObject();
@@ -101,7 +107,7 @@ public class ServerLockManager {
                     } else {
                         serverLocks.remove(thisPackEntry.uniqueId());
                     }
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }

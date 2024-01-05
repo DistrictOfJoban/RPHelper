@@ -1,5 +1,6 @@
 package com.lx862.jbrph.mixin;
 
+import com.lx862.jbrph.ClientEventQueue;
 import com.lx862.jbrph.data.manager.ServerLockManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.RunArgs;
@@ -20,6 +21,7 @@ public class MinecraftMixin {
 
     @Inject(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/resource/ResourcePackManager;createResourcePacks()Ljava/util/List;"))
     public void reloadResources(RunArgs args, CallbackInfo ci) {
+//        ClientEventQueue.invokeRPLoad();
         ServerLockManager.updatePackState(true);
     }
 }

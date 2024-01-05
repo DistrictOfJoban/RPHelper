@@ -16,8 +16,6 @@ import java.util.concurrent.CompletableFuture;
 
 public class PackManager {
     public static final Path RESOURCE_PACK_LOCATION = FabricLoader.getInstance().getGameDir().resolve("resourcepacks");
-    // TODO: Shouldn't be hardcoded to the mod jar, store it in pack.mcmeta perhaps?
-    public static final String[] ALLOWED_IPS = new String[]{"mc.joban.tk", "joban.sparked.network", "15.235.181.199:25659"};
     public static boolean stillDownloading = false;
     private static final Set<String> readyToBeUsedPacks = new HashSet<>();
 
@@ -25,16 +23,16 @@ public class PackManager {
         for(PackEntry packEntry : Config.getPackEntries()) {
             File packFile = RESOURCE_PACK_LOCATION.resolve(packEntry.fileName).toFile();
 
-            CompletableFuture.runAsync(() -> {
-                boolean hashMatches = HashManager.compareRemoteHash(packEntry, packFile, true);
-                if (hashMatches) {
-                    // Up to date
-                    markPackAsReady(packEntry);
+            boolean hashMatches = HashManager.compareRemoteHash(packEntry, packFile, true);
+            if (hashMatches) {
+                // Up to date
+                markPackAsReady(packEntry);
 
-                    MinecraftClient.getInstance().execute(() -> {
-                        ToastManager.upToDate(packEntry);
-                    });
-                } else {
+                MinecraftClient.getInstance().execute(() -> {
+                    ToastManager.upToDate(packEntry);
+                });
+            } else {
+                CompletableFuture.runAsync(() -> {
                     // Download
                     logPackInfo(packEntry, "Will be download.");
 
@@ -42,8 +40,8 @@ public class PackManager {
                     downloadPack(packEntry, packFile);
                     long timeDiff = System.currentTimeMillis() - curTime;
                     logPackInfo(packEntry, "Download finished, took " + (timeDiff / 1000.0) + "s");
-                }
-            });
+                });
+            }
         }
     }
     public static void downloadPack(PackEntry packEntry, File outputLocation) {

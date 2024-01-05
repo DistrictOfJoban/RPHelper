@@ -1,6 +1,7 @@
 package com.lx862.jbrph.data.manager;
 
 import com.lx862.jbrph.data.PackEntry;
+import com.lx862.jbrph.network.NetworkManager;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 
@@ -26,8 +27,7 @@ public class HashManager {
 
     public static String fetchRemoteHash(URL url) throws IOException {
         HttpURLConnection httpUrlConnection = (HttpURLConnection) url.openConnection();
-        httpUrlConnection.setReadTimeout(5000);
-        httpUrlConnection.setConnectTimeout(10000);
+        NetworkManager.setRequestTimeout(httpUrlConnection);
 
         try {
             return IOUtils.toString(httpUrlConnection.getInputStream(), StandardCharsets.UTF_8).trim();
