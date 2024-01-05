@@ -34,44 +34,52 @@ public class DownloadManager {
             partFile.delete();
         }
     }
+
     public static void download(URL url, File outputLocation, Consumer<Double> callback, Consumer<Boolean> finishedCallback) throws IOException {
         HttpURLConnection httpUrlConnection = (HttpURLConnection) url.openConnection();
         httpUrlConnection.setRequestProperty("Range", "bytes=0-1");
-        httpUrlConnection.connect();
 
-        long totalPackSize = Long.parseLong(httpUrlConnection.getHeaderField("Content-Range").split("/")[1]);
+        if(httpUrlConnection.getResponseCode() >= 400) {
+            RPHelperClient.LOGGER.error("[JBRPH] Received Error Code " + httpUrlConnection.getResponseCode() + " while downloading from " + url + "!");
+            httpUrlConnection.disconnect();
+            finishedCallback.accept(false);
+            return;
+        }
+
+        boolean supportsHttpRange = httpUrlConnection.getResponseCode() == 206;
+        long totalPackSize = supportsHttpRange ? Long.parseLong(httpUrlConnection.getHeaderField("Content-Range").split("/")[1]) : httpUrlConnection.getContentLength();
+
+        int totalParts = !supportsHttpRange ? 1 : (int)Math.ceil(totalPackSize / (double)PER_CHUNK);
         AtomicInteger totalDownloaded = new AtomicInteger();
 
-        int totalParts = (int)Math.ceil(totalPackSize / (double)PER_CHUNK);
-
-        boolean fullSuccess = true;
-
+        boolean allPartSuccessful = true;
         for(int i = 0; i < totalParts; i++) {
-            if(!fullSuccess) break;
+            if(!allPartSuccessful) break;
             boolean success = false;
             int retryCount = 0;
 
-            while(!success) {
-                if(retryCount >= 3) {
-                    RPHelperClient.LOGGER.error("[JBRPH] Cannot download after 3 attempts, giving up.");
-                    fullSuccess = false;
-                    break;
-                }
-
+            while(!success && retryCount < 3) {
                 File partFile = new File(outputLocation + ".part" + i);
+
+                int byteOffset = supportsHttpRange ? i * PER_CHUNK : -1;
+                long chunkLength = supportsHttpRange ? PER_CHUNK : totalPackSize == -1 ? Long.MAX_VALUE : totalPackSize;
+
                 AtomicInteger thisPartDownloaded = new AtomicInteger();
                 boolean partDownloaded = downloadPart(partFile, url, (byteDownloaded) -> {
                     thisPartDownloaded.addAndGet(byteDownloaded);
-                    callback.accept((double)(totalDownloaded.get() + thisPartDownloaded.get()) / totalPackSize);
-                }, (long) i * PER_CHUNK);
+                    double dlProgress = totalPackSize == -1 ? -1 : (double)(totalDownloaded.get() + thisPartDownloaded.get()) / totalPackSize;
+                    callback.accept(dlProgress);
+                }, byteOffset, chunkLength);
 
                 if(partDownloaded) {
                     success = true;
+                    allPartSuccessful = true;
                     totalDownloaded.addAndGet(thisPartDownloaded.get());
                     continue;
                 }
 
                 retryCount++;
+                allPartSuccessful = false;
 
                 try {
                     RPHelperClient.LOGGER.warn("[JBRPH] Failed to download part " + i + ", retrying in " + FAILED_TIMEOUT + " seconds...");
@@ -82,49 +90,45 @@ public class DownloadManager {
         }
 
         // Merge files
-        if(fullSuccess) {
-            mergePartFile(outputLocation, totalParts);
-        }
+        if(allPartSuccessful) mergePartFile(outputLocation, totalParts);
 
         cleanupPartFile(outputLocation, totalParts);
-        finishedCallback.accept(fullSuccess);
+        finishedCallback.accept(allPartSuccessful);
         httpUrlConnection.disconnect();
     }
 
-    public static boolean downloadPart(File outputFile, URL url, Consumer<Integer> callback, long byteOffset) {
+    public static boolean downloadPart(File outputFile, URL url, Consumer<Integer> callback, long byteOffset, long chunkLength) {
         int thisDownloaded = 0;
 
         try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(outputFile))) {
             HttpURLConnection nhr = (HttpURLConnection) url.openConnection();
-            nhr.setConnectTimeout(10 * 1000);
-            nhr.setReadTimeout(10 * 1000);
-            nhr.setRequestProperty("Range", "bytes=" + byteOffset + "-" + (byteOffset + PER_CHUNK));
+            NetworkManager.setRequestTimeout(nhr);
+
+            // Http Range Support
+            boolean supportRange = byteOffset != -1;
+            if(supportRange) nhr.setRequestProperty("Range", "bytes=" + byteOffset + "-" + (byteOffset + chunkLength));
 
             try(BufferedInputStream ns = new BufferedInputStream(nhr.getInputStream())) {
                 byte[] dataBuffer = new byte[1024];
                 while(true) {
-                    int br = ns.read(dataBuffer, 0, Math.min(PER_CHUNK - thisDownloaded, 1024));
-                    if(br == -1) break;
-                    if(thisDownloaded >= PER_CHUNK) {
-                        break;
-                    }
+                    int nextReadLength = (int)Math.min(chunkLength - thisDownloaded, 1024);
+                    int byteRead = ns.read(dataBuffer, 0, nextReadLength);
+                    if(byteRead == -1 || thisDownloaded >= chunkLength) break;
 
-                    bos.write(dataBuffer, 0, br);
-
-                    thisDownloaded += br;
-                    callback.accept(br);
+                    bos.write(dataBuffer, 0, byteRead);
+                    thisDownloaded += byteRead;
+                    callback.accept(byteRead);
                 }
             } catch (SocketException | SocketTimeoutException e) {
                 RPHelperClient.LOGGER.error("[JBRPH] Timed out while downloading!");
-                nhr.disconnect();
                 return false;
             } catch (Exception e) {
                 e.printStackTrace();
-                nhr.disconnect();
                 return false;
+            } finally {
+                nhr.disconnect();
             }
 
-            nhr.disconnect();
             return true;
         } catch (Exception e) {
             e.printStackTrace();
