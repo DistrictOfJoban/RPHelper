@@ -13,6 +13,7 @@ import java.util.List;
 public class Config {
     private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("jbrph.json");
     private static final List<PackEntry> packEntries = new ArrayList<>();
+    private static int requestTimeoutSec = 10;
 
     static {
         try {
@@ -38,6 +39,8 @@ public class Config {
                     ex.printStackTrace();
                 }
             });
+
+            requestTimeoutSec = jsonObject.get("requestTimeoutSec").getAsInt();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -52,6 +55,7 @@ public class Config {
                 entryArray.add(entryObject);
             }
             jsonObject.add("packs", entryArray);
+            jsonObject.addProperty("requestTimeoutSec", requestTimeoutSec);
 
             Files.writeString(CONFIG_PATH, new GsonBuilder().setPrettyPrinting().create().toJson(jsonObject));
         } catch (Exception e) {
@@ -61,6 +65,10 @@ public class Config {
 
     public static List<PackEntry> getPackEntries() {
         return packEntries;
+    }
+
+    public static int getRequestTimeoutSec() {
+        return requestTimeoutSec;
     }
 
     public static PackEntry getPackEntry(String name) {
