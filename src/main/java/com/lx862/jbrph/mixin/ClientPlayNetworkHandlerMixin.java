@@ -14,13 +14,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ClientPlayNetworkHandlerMixin {
     @Inject(method = "onResourcePackSend", at = @At("HEAD"), cancellable = true)
     public void onResourcePackSend(ResourcePackSendS2CPacket packet, CallbackInfo ci) {
-        for(PackEntry packEntry : Config.getPackEntries()) {
-            if(packet.getURL().trim().equals(packEntry.sourceUrl.toString())) {
-                if(PackManager.isPackReady(packEntry)) {
-                    // Stop showing the vanilla server RP screen if we already have it downloaded
-                    ci.cancel();
-                }
-            }
+        if(Config.havePackEntryWithUrl(packet.getURL())) {
+            ci.cancel();
         }
     }
 }

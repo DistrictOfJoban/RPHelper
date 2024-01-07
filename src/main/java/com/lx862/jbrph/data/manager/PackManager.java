@@ -39,7 +39,7 @@ public class PackManager {
                     long curTime = System.currentTimeMillis();
                     downloadPack(packEntry, packFile);
                     long timeDiff = System.currentTimeMillis() - curTime;
-                    logPackInfo(packEntry, "Download finished, took " + (timeDiff / 1000.0) + "s");
+                    logPackInfo(packEntry, "Download took " + (timeDiff / 1000.0) + "s");
                 });
             }
         }
@@ -68,6 +68,7 @@ public class PackManager {
                     if(!HashManager.compareRemoteHash(packEntry, outputLocation)) {
                         logPackInfo(packEntry, "Download finished but hash does not match, not applying!");
                         packNotReady(packEntry);
+                        ToastManager.cancel("Downloaded pack is corrupted!");
                     } else {
                         markPackAsReady(packEntry);
                         ServerLockManager.reloadPackDueToUpdate();

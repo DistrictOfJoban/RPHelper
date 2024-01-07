@@ -8,7 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class RPHelperClient implements ClientModInitializer {
-    public static final Logger LOGGER = LogManager.getLogger("JobanSRPClient");
+    public static final Logger LOGGER = LogManager.getLogger("JobanRPHClient");
     @Override
     public void onInitializeClient() {
         Config.load();
