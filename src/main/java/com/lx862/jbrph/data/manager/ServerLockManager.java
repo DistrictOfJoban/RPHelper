@@ -50,7 +50,9 @@ public class ServerLockManager {
             String[] serverLock = serverLocks.get(packEntry.uniqueId());
 
             boolean serverMatched = false;
-            if(currentServerEntry != null && serverLock != null) {
+            if(serverLock == null) {
+                serverMatched = true;
+            } else if(currentServerEntry != null) {
                 serverMatched = Arrays.asList(serverLock).contains(currentServerEntry.address);
             }
 
@@ -80,6 +82,7 @@ public class ServerLockManager {
     }
 
     public static void refreshServerLockList() {
+        serverLocks.clear();
         Collection<ResourcePackProfile> profiles = MinecraftClient.getInstance().getResourcePackManager().getProfiles();
         for(ResourcePackProfile resourcePackProfile : profiles) {
             PackEntry thisPackEntry = Config.getPackEntry(resourcePackProfile.getName());
@@ -104,8 +107,6 @@ public class ServerLockManager {
                             newIpArray[i] = array.get(i).getAsString();
                         }
                         serverLocks.put(thisPackEntry.uniqueId(), newIpArray);
-                    } else {
-                        serverLocks.remove(thisPackEntry.uniqueId());
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
