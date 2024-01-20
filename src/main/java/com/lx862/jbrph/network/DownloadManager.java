@@ -7,6 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -90,7 +91,10 @@ public class DownloadManager {
         }
 
         // Merge files
-        if(allPartSuccessful) mergePartFile(outputLocation, totalParts);
+        if(allPartSuccessful) {
+            Files.deleteIfExists(outputLocation.toPath());
+            mergePartFile(outputLocation, totalParts);
+        }
 
         cleanupPartFile(outputLocation, totalParts);
         finishedCallback.accept(allPartSuccessful);

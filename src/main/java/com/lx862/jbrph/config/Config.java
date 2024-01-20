@@ -73,7 +73,7 @@ public class Config {
 
     public static PackEntry getPackEntry(String name) {
         String finalName = name.contains("file/") ? name.split("/")[1] : name;
-        return packEntries.stream().filter(e -> e.fileName.equals(finalName)).findFirst().orElse(null);
+        return packEntries.stream().filter(e -> e.getFileName().equals(finalName)).findFirst().orElse(null);
     }
 
     public static boolean havePackEntryWithUrl(String url) {

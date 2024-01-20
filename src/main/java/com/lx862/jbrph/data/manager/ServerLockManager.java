@@ -3,7 +3,6 @@ package com.lx862.jbrph.data.manager;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.lx862.jbrph.RPHelperClient;
 import com.lx862.jbrph.config.Config;
 import com.lx862.jbrph.data.PackEntry;
 import net.minecraft.client.MinecraftClient;
@@ -14,7 +13,6 @@ import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.resource.ResourcePackProfile;
 import org.apache.commons.io.IOUtils;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -45,7 +43,7 @@ public class ServerLockManager {
                 return;
             }
 
-            String packName = "file/" + packEntry.fileName;
+            String packName = "file/" + packEntry.getFileName();
             ServerInfo currentServerEntry = mc.getCurrentServerEntry();
             String[] serverLock = serverLocks.get(packEntry.uniqueId());
 

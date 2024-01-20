@@ -21,7 +21,7 @@ public class PackManager {
 
     public static void downloadPackIfNeedUpdate() {
         for(PackEntry packEntry : Config.getPackEntries()) {
-            File packFile = RESOURCE_PACK_LOCATION.resolve(packEntry.fileName).toFile();
+            File packFile = RESOURCE_PACK_LOCATION.resolve(packEntry.getFileName()).toFile();
 
             boolean hashMatches = HashManager.compareRemoteHash(packEntry, packFile, true);
             if (hashMatches) {

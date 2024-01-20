@@ -4,12 +4,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.Objects;
 
 public class PackEntry {
     public final URL sourceUrl;
     public final @Nullable URL hashUrl;
-    public final String fileName;
+    private final String fileName;
     public final String name;
 
     public PackEntry(@Nullable String name, String sourceUrl, @Nullable String hashUrl, String fileName) throws MalformedURLException {
@@ -22,6 +23,10 @@ public class PackEntry {
 
     public String uniqueId() {
         return this.sourceUrl + (this.hashUrl == null ? "" : this.hashUrl.toString()) + this.fileName;
+    }
+
+    public String getFileName() {
+        return Paths.get(fileName).getFileName().toString();
     }
 
     @Override
