@@ -1,8 +1,6 @@
-package com.lx862.jbrph.mixin;
+package com.lx862.rphelper.mixin;
 
-import com.lx862.jbrph.data.manager.PackManager;
-import com.lx862.jbrph.config.Config;
-import com.lx862.jbrph.data.PackEntry;
+import com.lx862.rphelper.config.Config;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.packet.s2c.play.ResourcePackSendS2CPacket;
 import org.spongepowered.asm.mixin.Mixin;

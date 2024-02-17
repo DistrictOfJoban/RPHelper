@@ -1,9 +1,8 @@
-package com.lx862.jbrph.data.manager;
+package com.lx862.rphelper.data.manager;
 
-import com.lx862.jbrph.RPHelperClient;
-import com.lx862.jbrph.data.HashComparisonResult;
-import com.lx862.jbrph.data.PackEntry;
-import com.lx862.jbrph.network.NetworkManager;
+import com.lx862.rphelper.data.HashComparisonResult;
+import com.lx862.rphelper.data.PackEntry;
+import com.lx862.rphelper.network.NetworkManager;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 

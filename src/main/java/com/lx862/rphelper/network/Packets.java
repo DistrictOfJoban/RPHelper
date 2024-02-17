@@ -1,8 +1,8 @@
-package com.lx862.jbrph.network;
+package com.lx862.rphelper.network;
 
-import com.lx862.jbrph.data.Log;
-import com.lx862.jbrph.data.manager.PackManager;
-import com.lx862.jbrph.data.manager.ServerLockManager;
+import com.lx862.rphelper.data.Log;
+import com.lx862.rphelper.data.manager.PackManager;
+import com.lx862.rphelper.data.manager.ServerLockManager;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.util.Identifier;

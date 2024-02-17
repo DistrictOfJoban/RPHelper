@@ -1,4 +1,4 @@
-package com.lx862.jbrph;
+package com.lx862.rphelper;
 
 public class Util {
     public static double get1DecPlace(double d) {

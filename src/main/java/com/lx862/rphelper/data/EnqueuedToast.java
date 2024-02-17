@@ -1,4 +1,4 @@
-package com.lx862.jbrph.data;
+package com.lx862.rphelper.data;
 
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.text.Text;

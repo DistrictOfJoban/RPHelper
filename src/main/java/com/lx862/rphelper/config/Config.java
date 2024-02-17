@@ -1,7 +1,7 @@
-package com.lx862.jbrph.config;
+package com.lx862.rphelper.config;
 
 import com.google.gson.*;
-import com.lx862.jbrph.data.PackEntry;
+import com.lx862.rphelper.data.PackEntry;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.nio.file.Files;

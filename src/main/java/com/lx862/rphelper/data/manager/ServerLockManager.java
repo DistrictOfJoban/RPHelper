@@ -1,10 +1,10 @@
-package com.lx862.jbrph.data.manager;
+package com.lx862.rphelper.data.manager;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.lx862.jbrph.config.Config;
-import com.lx862.jbrph.data.PackEntry;
+import com.lx862.rphelper.config.Config;
+import com.lx862.rphelper.data.PackEntry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.resource.AbstractFileResourcePack;

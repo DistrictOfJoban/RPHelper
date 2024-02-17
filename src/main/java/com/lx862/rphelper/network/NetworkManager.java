@@ -1,6 +1,6 @@
-package com.lx862.jbrph.network;
+package com.lx862.rphelper.network;
 
-import com.lx862.jbrph.config.Config;
+import com.lx862.rphelper.config.Config;
 
 import java.net.HttpURLConnection;
 

@@ -1,11 +1,11 @@
-package com.lx862.jbrph.data.manager;
+package com.lx862.rphelper.data.manager;
 
-import com.lx862.jbrph.Util;
-import com.lx862.jbrph.config.Config;
-import com.lx862.jbrph.data.HashComparisonResult;
-import com.lx862.jbrph.data.Log;
-import com.lx862.jbrph.data.PackEntry;
-import com.lx862.jbrph.network.DownloadManager;
+import com.lx862.rphelper.Util;
+import com.lx862.rphelper.config.Config;
+import com.lx862.rphelper.data.HashComparisonResult;
+import com.lx862.rphelper.data.Log;
+import com.lx862.rphelper.data.PackEntry;
+import com.lx862.rphelper.network.DownloadManager;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 

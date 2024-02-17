@@ -1,6 +1,6 @@
-package com.lx862.jbrph.command;
+package com.lx862.rphelper.command;
 
-import com.lx862.jbrph.network.Packets;
+import com.lx862.rphelper.network.Packets;
 import com.mojang.brigadier.CommandDispatcher;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;

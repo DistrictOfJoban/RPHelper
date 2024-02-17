@@ -1,6 +1,6 @@
-package com.lx862.jbrph.mixin;
+package com.lx862.rphelper.mixin;
 
-import com.lx862.jbrph.data.manager.ServerLockManager;
+import com.lx862.rphelper.data.manager.ServerLockManager;
 import net.minecraft.client.gui.screen.option.OptionsScreen;
 import net.minecraft.resource.ResourcePackManager;
 import org.spongepowered.asm.mixin.Mixin;

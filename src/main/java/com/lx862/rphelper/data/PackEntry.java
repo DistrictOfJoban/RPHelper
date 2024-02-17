@@ -1,4 +1,4 @@
-package com.lx862.jbrph.data;
+package com.lx862.rphelper.data;
 
 import org.jetbrains.annotations.Nullable;
 

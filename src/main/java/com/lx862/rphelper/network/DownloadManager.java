@@ -1,6 +1,6 @@
-package com.lx862.jbrph.network;
+package com.lx862.rphelper.network;
 
-import com.lx862.jbrph.data.Log;
+import com.lx862.rphelper.data.Log;
 
 import java.io.*;
 import java.net.*;

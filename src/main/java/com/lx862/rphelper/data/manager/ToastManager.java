@@ -1,8 +1,8 @@
-package com.lx862.jbrph.data.manager;
+package com.lx862.rphelper.data.manager;
 
-import com.lx862.jbrph.Util;
-import com.lx862.jbrph.data.EnqueuedToast;
-import com.lx862.jbrph.data.PackEntry;
+import com.lx862.rphelper.Util;
+import com.lx862.rphelper.data.EnqueuedToast;
+import com.lx862.rphelper.data.PackEntry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.text.Text;

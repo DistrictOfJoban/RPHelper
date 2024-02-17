@@ -1,4 +1,4 @@
-package com.lx862.jbrph.data;
+package com.lx862.rphelper.data;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
