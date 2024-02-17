@@ -1,8 +1,9 @@
 {
-  "gui.jbrph.rpupdate.title": "Resource Pack Update",
-  "gui.jbrph.rpdownload.title": "Downloading Resource Pack",
-  "gui.jbrph.rpdownload.generic": "%s > Please wait...",
-  "gui.jbrph.rpdownload.percentage": "%s > %f%% done.",
-  "gui.jbrph.rpupdate.failed": "Failed: %s",
-  "gui.jbrph.rpupdate.uptodate": "%s up to date!"
+  "gui.jbrph.rpfail.title": "Pack failed!",
+  "gui.jbrph.rpfail.description": "%s > %s",
+  "gui.jbrph.rpupdate.title": "Pack Update: %s",
+  "gui.jbrph.rpupdate.uptodate": "Resource pack is up to date!",
+  "gui.jbrph.rpdownload.title": "Downloading pack",
+  "gui.jbrph.rpdownload.description1": "Please wait...",
+  "gui.jbrph.rpdownload.description2": "%s > %f%% done."
 }

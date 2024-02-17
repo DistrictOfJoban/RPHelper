@@ -23,14 +23,14 @@ public class ServerLockManager {
     private static final HashMap<String, String[]> serverLocks = new HashMap<>();
 
     public static void reloadPackDueToUpdate() {
-        refreshRepository(false, true);
+        updatePackState(false, true);
     }
 
-    public static void updatePackState(boolean calledBeforeBeforeRPLoad) {
-        refreshRepository(calledBeforeBeforeRPLoad, false);
+    public static void updatePackState(boolean dontReload) {
+        updatePackState(dontReload, false);
     }
 
-    private static void refreshRepository(boolean dontReload, boolean forced) {
+    private static void updatePackState(boolean dontReload, boolean forced) {
         refreshServerLockList();
         MinecraftClient mc = MinecraftClient.getInstance();
         boolean packChanged = false;
@@ -75,7 +75,7 @@ public class ServerLockManager {
         }
 
         if((packChanged || forced) && !dontReload) {
-            reload();
+            MinecraftClient.getInstance().reloadResources();
         }
     }
 
@@ -111,9 +111,5 @@ public class ServerLockManager {
                 }
             }
         }
-    }
-
-    public static void reload() {
-        MinecraftClient.getInstance().reloadResources();
     }
 }

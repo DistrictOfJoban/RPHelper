@@ -1,12 +1,9 @@
 package com.lx862.jbrph.network;
 
-import com.lx862.jbrph.RPHelperClient;
+import com.lx862.jbrph.data.Log;
 
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.net.URL;
+import java.net.*;
 import java.nio.file.Files;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -36,16 +33,26 @@ public class DownloadManager {
         }
     }
 
-    public static void download(URL url, File outputLocation, Consumer<Double> callback, Consumer<Boolean> finishedCallback) throws IOException {
+    public static void download(URL url, File outputLocation, Consumer<Double> callback, Consumer<String> finishedCallback) throws IOException {
         HttpURLConnection httpUrlConnection = (HttpURLConnection) url.openConnection();
         httpUrlConnection.setRequestProperty("Range", "bytes=0-1");
 
-        if(httpUrlConnection.getResponseCode() >= 400) {
-            RPHelperClient.LOGGER.error("[JBRPH] Received Error Code " + httpUrlConnection.getResponseCode() + " while downloading from " + url + "!");
+        try {
+            int httpCode = httpUrlConnection.getResponseCode();
+            if(httpCode >= 400) {
+                Log.error("Received Error Code " + httpCode + " while downloading from " + url + "!");
+                httpUrlConnection.disconnect();
+                finishedCallback.accept("HTTP Error " + httpCode);
+                return;
+            }
+        } catch (UnknownHostException e) {
+            Log.error("Cannot resolve host " + url + "!");
             httpUrlConnection.disconnect();
-            finishedCallback.accept(false);
+            finishedCallback.accept("Can't resolve host for URL.");
             return;
         }
+
+
 
         boolean supportsHttpRange = httpUrlConnection.getResponseCode() == 206;
         long totalPackSize = supportsHttpRange ? Long.parseLong(httpUrlConnection.getHeaderField("Content-Range").split("/")[1]) : httpUrlConnection.getContentLength();
@@ -83,7 +90,7 @@ public class DownloadManager {
                 allPartSuccessful = false;
 
                 try {
-                    RPHelperClient.LOGGER.warn("[JBRPH] Failed to download part " + i + ", retrying in " + FAILED_TIMEOUT + " seconds...");
+                    Log.warn("Failed to download part " + i + ", retrying in " + FAILED_TIMEOUT + " seconds...");
                     Thread.sleep(FAILED_TIMEOUT * 1000);
                 } catch (Exception ignored) {
                 }
@@ -97,7 +104,7 @@ public class DownloadManager {
         }
 
         cleanupPartFile(outputLocation, totalParts);
-        finishedCallback.accept(allPartSuccessful);
+        finishedCallback.accept(allPartSuccessful ? null : "Download interrupted!");
         httpUrlConnection.disconnect();
     }
 
@@ -124,7 +131,7 @@ public class DownloadManager {
                     callback.accept(byteRead);
                 }
             } catch (SocketException | SocketTimeoutException e) {
-                RPHelperClient.LOGGER.error("[JBRPH] Timed out while downloading!");
+                Log.error("Timed out while downloading!");
                 return false;
             } catch (Exception e) {
                 e.printStackTrace();

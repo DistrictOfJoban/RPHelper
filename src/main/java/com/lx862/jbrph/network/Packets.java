@@ -1,6 +1,6 @@
 package com.lx862.jbrph.network;
 
-import com.lx862.jbrph.RPHelperClient;
+import com.lx862.jbrph.data.Log;
 import com.lx862.jbrph.data.manager.PackManager;
 import com.lx862.jbrph.data.manager.ServerLockManager;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -12,12 +12,9 @@ import java.util.concurrent.CompletableFuture;
 public class Packets {
     public static final Identifier SEND_UPDATE_RP = new Identifier("jbrph", "rp_updated");
 
-    public static void registerServer() {
-    }
-
     public static void registerClient() {
         ClientPlayConnectionEvents.JOIN.register((networkHandler, packetSender, client) -> {
-            RPHelperClient.LOGGER.info("Validating RP State");
+            Log.info("Validating RP State");
             client.execute(() -> {
                 ServerLockManager.updatePackState(false);
             });

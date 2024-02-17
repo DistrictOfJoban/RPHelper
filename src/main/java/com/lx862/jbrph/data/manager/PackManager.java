@@ -1,8 +1,8 @@
 package com.lx862.jbrph.data.manager;
 
-import com.lx862.jbrph.RPHelperClient;
 import com.lx862.jbrph.Util;
 import com.lx862.jbrph.config.Config;
+import com.lx862.jbrph.data.Log;
 import com.lx862.jbrph.data.PackEntry;
 import com.lx862.jbrph.network.DownloadManager;
 import net.fabricmc.loader.api.FabricLoader;
@@ -39,7 +39,7 @@ public class PackManager {
                     long curTime = System.currentTimeMillis();
                     downloadPack(packEntry, packFile);
                     long timeDiff = System.currentTimeMillis() - curTime;
-                    logPackInfo(packEntry, "Download took " + (timeDiff / 1000.0) + "s");
+                    logPackInfo(packEntry, "Took " + (timeDiff / 1000.0) + "s");
                 });
             }
         }
@@ -59,24 +59,24 @@ public class PackManager {
 
                 ToastManager.updateDownloadToastProgress(packEntry, prg);
                 PackManager.stillDownloading = true;
-            }, (succeeded) -> {
+            }, (errorMsg) -> {
                 PackManager.stillDownloading = false;
 
-                if(succeeded) {
+                if(errorMsg == null) {
                     logPackInfo(packEntry, "Pack Download finished.");
 
                     if(!HashManager.compareRemoteHash(packEntry, outputLocation)) {
-                        logPackInfo(packEntry, "Download finished but hash does not match, not applying!");
+                        logPackWarn(packEntry, "Download finished but hash does not match, not applying!");
                         packNotReady(packEntry);
-                        ToastManager.cancel("Downloaded pack is corrupted!");
+                        ToastManager.fail(packEntry.name, "Pack is corrupted!");
                     } else {
                         markPackAsReady(packEntry);
                         ServerLockManager.reloadPackDueToUpdate();
                     }
                 } else {
-                    logPackInfo(packEntry, "Failed to download resource pack!");
+                    logPackWarn(packEntry, "Failed to download resource pack!");
                     packNotReady(packEntry);
-                    ToastManager.cancel("Cannot download resource pack!");
+                    ToastManager.fail(packEntry.name, errorMsg);
                 }
             });
         } catch (Exception e) {
@@ -97,14 +97,14 @@ public class PackManager {
     }
 
     public static void logPackInfo(PackEntry entry, String content) {
-        RPHelperClient.LOGGER.info("[RPHelper] [" + entry.name + "] " + content);
+        Log.info("[" + entry.name + "] " + content);
     }
 
     public static void logPackWarn(PackEntry entry, String content) {
-        RPHelperClient.LOGGER.warn("[RPHelper] [" + entry.name + "] " + content);
+        Log.warn("[" + entry.name + "] " + content);
     }
 
     public static void logPackError(PackEntry entry, String content) {
-        RPHelperClient.LOGGER.error("[RPHelper] [" + entry.name + "] " + content);
+        Log.error("[" + entry.name + "] " + content);
     }
 }

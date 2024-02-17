@@ -1,5 +1,6 @@
 package com.lx862.jbrph.data.manager;
 
+import com.lx862.jbrph.RPHelperClient;
 import com.lx862.jbrph.data.PackEntry;
 import com.lx862.jbrph.network.NetworkManager;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -10,6 +11,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
@@ -31,6 +33,8 @@ public class HashManager {
 
         try {
             return IOUtils.toString(httpUrlConnection.getInputStream(), StandardCharsets.UTF_8).trim();
+        } catch (UnknownHostException e) {
+            return null;
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -65,15 +69,15 @@ public class HashManager {
             }
 
             if(remoteSha1 == null) {
-                PackManager.logPackInfo(packEntry, "Cannot obtain remote SHA1, hope local one is up to date?");
-                return true;
+                PackManager.logPackWarn(packEntry, "Cannot obtain remote SHA1 from URL " + packEntry.hashUrl);
+                return false;
             }
 
             addHashCache(packEntry, remoteSha1);
             if(remoteSha1.equals(localSha1)) {
                 PackManager.logPackInfo(packEntry, "Hash OK: " + remoteSha1);
             } else {
-                PackManager.logPackInfo(packEntry, "Hash Different! Remote: " + remoteSha1 + ", Local: " + localSha1);
+                PackManager.logPackWarn(packEntry, "Hash Different! Remote: " + remoteSha1 + ", Local: " + localSha1);
             }
             return remoteSha1.equals(localSha1);
         } catch (Exception e) {

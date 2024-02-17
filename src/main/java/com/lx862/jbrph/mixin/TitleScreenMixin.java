@@ -18,12 +18,14 @@ public class TitleScreenMixin {
 
     @Inject(method = "render", at = @At("HEAD"))
     public void render(CallbackInfo ci) {
-        ToastManager.readyToSendToast();
+        if(!toastShown) {
+            ToastManager.readyToSendToast();
 
-        if(PackManager.stillDownloading && !toastShown) {
-            for(PackEntry packEntry : Config.getPackEntries()) {
-                if(!PackManager.isPackReady(packEntry)) {
-                    ToastManager.setupNewDownloadToast(packEntry);
+            if(PackManager.stillDownloading) {
+                for(PackEntry packEntry : Config.getPackEntries()) {
+                    if(!PackManager.isPackReady(packEntry)) {
+                        ToastManager.setupNewDownloadToast(packEntry);
+                    }
                 }
             }
             toastShown = true;
