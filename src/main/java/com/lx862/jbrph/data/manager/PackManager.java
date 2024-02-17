@@ -2,6 +2,7 @@ package com.lx862.jbrph.data.manager;
 
 import com.lx862.jbrph.Util;
 import com.lx862.jbrph.config.Config;
+import com.lx862.jbrph.data.HashComparisonResult;
 import com.lx862.jbrph.data.Log;
 import com.lx862.jbrph.data.PackEntry;
 import com.lx862.jbrph.network.DownloadManager;
@@ -19,12 +20,12 @@ public class PackManager {
     public static boolean stillDownloading = false;
     private static final Set<String> readyToBeUsedPacks = new HashSet<>();
 
-    public static void downloadPackIfNeedUpdate() {
+    public static void downloadOrUpdate() {
         for(PackEntry packEntry : Config.getPackEntries()) {
             File packFile = RESOURCE_PACK_LOCATION.resolve(packEntry.getFileName()).toFile();
 
-            boolean hashMatches = HashManager.compareRemoteHash(packEntry, packFile, true);
-            if (hashMatches) {
+            HashComparisonResult hashResult = HashManager.compareRemoteHash(packEntry, packFile, true);
+            if (hashResult == HashComparisonResult.MATCH) {
                 // Up to date
                 markPackAsReady(packEntry);
 
@@ -63,9 +64,10 @@ public class PackManager {
                 PackManager.stillDownloading = false;
 
                 if(errorMsg == null) {
+                    ToastManager.updateDownloadToastProgress(packEntry, 100);
                     logPackInfo(packEntry, "Pack Download finished.");
 
-                    if(!HashManager.compareRemoteHash(packEntry, outputLocation)) {
+                    if(HashManager.compareRemoteHash(packEntry, outputLocation) == HashComparisonResult.MISMATCH) {
                         logPackWarn(packEntry, "Download finished but hash does not match, not applying!");
                         packNotReady(packEntry);
                         ToastManager.fail(packEntry.name, "Pack is corrupted!");

@@ -1,6 +1,7 @@
 package com.lx862.jbrph.data.manager;
 
 import com.lx862.jbrph.RPHelperClient;
+import com.lx862.jbrph.data.HashComparisonResult;
 import com.lx862.jbrph.data.PackEntry;
 import com.lx862.jbrph.network.NetworkManager;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -51,12 +52,12 @@ public class HashManager {
         }
     }
 
-    public static boolean compareRemoteHash(PackEntry packEntry, File localFile) {
+    public static HashComparisonResult compareRemoteHash(PackEntry packEntry, File localFile) {
         return compareRemoteHash(packEntry, localFile, false);
     }
 
-    public static boolean compareRemoteHash(PackEntry packEntry, File localFile, boolean ignoreCache) {
-        if(packEntry.hashUrl == null) return false;
+    public static HashComparisonResult compareRemoteHash(PackEntry packEntry, File localFile, boolean ignoreCache) {
+        if(packEntry.hashUrl == null) return HashComparisonResult.NOT_AVAIL;
 
         try {
             String cachedRemoteSha1 = getCachedRemoteHash(packEntry);
@@ -65,12 +66,12 @@ public class HashManager {
 
             if(localSha1 == null && localFile.exists()) {
                 PackManager.logPackWarn(packEntry, "Failed to obtain local SHA1, hope local one is up to date?");
-                return true;
+                return HashComparisonResult.MATCH;
             }
 
             if(remoteSha1 == null) {
                 PackManager.logPackWarn(packEntry, "Cannot obtain remote SHA1 from URL " + packEntry.hashUrl);
-                return false;
+                return HashComparisonResult.NOT_AVAIL;
             }
 
             addHashCache(packEntry, remoteSha1);
@@ -79,10 +80,10 @@ public class HashManager {
             } else {
                 PackManager.logPackWarn(packEntry, "Hash Different! Remote: " + remoteSha1 + ", Local: " + localSha1);
             }
-            return remoteSha1.equals(localSha1);
+            return remoteSha1.equals(localSha1) ? HashComparisonResult.MATCH : HashComparisonResult.MISMATCH;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return false;
+        return HashComparisonResult.NOT_AVAIL;
     }
 }

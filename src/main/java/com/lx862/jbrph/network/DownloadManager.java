@@ -60,18 +60,24 @@ public class DownloadManager {
         int totalParts = !supportsHttpRange ? 1 : (int)Math.ceil(totalPackSize / (double)PER_CHUNK);
         AtomicInteger totalDownloaded = new AtomicInteger();
 
-        boolean allPartSuccessful = true;
+        boolean successfulSoFar = true;
         for(int i = 0; i < totalParts; i++) {
-            if(!allPartSuccessful) break;
+            if(!successfulSoFar) break;
+            int byteOffset = supportsHttpRange ? i * PER_CHUNK : -1;
+            long chunkLength = supportsHttpRange ? PER_CHUNK : totalPackSize == -1 ? Long.MAX_VALUE : totalPackSize;
+
+            File partFile = new File(outputLocation + ".part" + i);
+            if(partFile.exists() && partFile.length() == chunkLength) {
+                // Assume the file is downloaded properly, we'll do one final hash check before applying so hopefully this isn't too big of a problem
+                Log.info("Found " + partFile.getName() + ", continuing...");
+                totalDownloaded.addAndGet(PER_CHUNK);
+                continue;
+            }
+
             boolean success = false;
             int retryCount = 0;
 
             while(!success && retryCount < 3) {
-                File partFile = new File(outputLocation + ".part" + i);
-
-                int byteOffset = supportsHttpRange ? i * PER_CHUNK : -1;
-                long chunkLength = supportsHttpRange ? PER_CHUNK : totalPackSize == -1 ? Long.MAX_VALUE : totalPackSize;
-
                 AtomicInteger thisPartDownloaded = new AtomicInteger();
                 boolean partDownloaded = downloadPart(partFile, url, (byteDownloaded) -> {
                     thisPartDownloaded.addAndGet(byteDownloaded);
@@ -81,13 +87,13 @@ public class DownloadManager {
 
                 if(partDownloaded) {
                     success = true;
-                    allPartSuccessful = true;
+                    successfulSoFar = true;
                     totalDownloaded.addAndGet(thisPartDownloaded.get());
                     continue;
                 }
 
                 retryCount++;
-                allPartSuccessful = false;
+                successfulSoFar = false;
 
                 try {
                     Log.warn("Failed to download part " + i + ", retrying in " + FAILED_TIMEOUT + " seconds...");
@@ -98,13 +104,13 @@ public class DownloadManager {
         }
 
         // Merge files
-        if(allPartSuccessful) {
+        if(successfulSoFar) {
             Files.deleteIfExists(outputLocation.toPath());
             mergePartFile(outputLocation, totalParts);
         }
 
         cleanupPartFile(outputLocation, totalParts);
-        finishedCallback.accept(allPartSuccessful ? null : "Download interrupted!");
+        finishedCallback.accept(successfulSoFar ? null : "Download interrupted!");
         httpUrlConnection.disconnect();
     }
 
