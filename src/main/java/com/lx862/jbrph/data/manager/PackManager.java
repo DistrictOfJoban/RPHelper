@@ -97,14 +97,14 @@ public class PackManager {
     }
 
     public static void logPackInfo(PackEntry entry, String content) {
-        RPHelperClient.LOGGER.info("[JBRPH] [" + entry.name + "] " + content);
+        RPHelperClient.LOGGER.info("[RPHelper] [" + entry.name + "] " + content);
     }
 
     public static void logPackWarn(PackEntry entry, String content) {
-        RPHelperClient.LOGGER.warn("[JBRPH] [" + entry.name + "] " + content);
+        RPHelperClient.LOGGER.warn("[RPHelper] [" + entry.name + "] " + content);
     }
 
     public static void logPackError(PackEntry entry, String content) {
-        RPHelperClient.LOGGER.error("[JBRPH] [" + entry.name + "] " + content);
+        RPHelperClient.LOGGER.error("[RPHelper] [" + entry.name + "] " + content);
     }
 }

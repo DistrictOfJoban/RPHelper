@@ -1,4 +1,4 @@
-# Joban Resource Pack Helper
+# Resource Pack Helper
 This is the resource pack updater to be used by The District of Joban for players, intended to replace the vanilla server resource pack.
 
 ![Minecraft title screen with 3 toast notification, downloading 3 resource packs](./assets/preview.png)
