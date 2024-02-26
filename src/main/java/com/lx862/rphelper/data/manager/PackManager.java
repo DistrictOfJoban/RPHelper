@@ -64,7 +64,7 @@ public class PackManager {
                 PackManager.stillDownloading = false;
 
                 if(errorMsg == null) {
-                    ToastManager.updateDownloadToastProgress(packEntry, 100);
+                    ToastManager.updateDownloadToastProgress(packEntry, 1);
                     logPackInfo(packEntry, "Pack Download finished.");
 
                     if(HashManager.compareRemoteHash(packEntry, outputLocation) == HashComparisonResult.MISMATCH) {
