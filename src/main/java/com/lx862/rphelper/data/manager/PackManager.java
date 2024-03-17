@@ -35,7 +35,7 @@ public class PackManager {
             } else {
                 CompletableFuture.runAsync(() -> {
                     // Download
-                    logPackInfo(packEntry, "Will be download.");
+                    logPackInfo(packEntry, "The resource pack will be downloaded.");
 
                     long curTime = System.currentTimeMillis();
                     downloadPack(packEntry, packFile);
@@ -65,15 +65,16 @@ public class PackManager {
 
                 if(errorMsg == null) {
                     ToastManager.updateDownloadToastProgress(packEntry, 1);
-                    logPackInfo(packEntry, "Pack Download finished.");
+                    logPackInfo(packEntry, "The resource pack has been downloaded successfully!");
 
                     if(HashManager.compareRemoteHash(packEntry, outputLocation) == HashComparisonResult.MISMATCH) {
-                        logPackWarn(packEntry, "Download finished but hash does not match, not applying!");
+                        logPackWarn(packEntry, "The resource pack has been downloaded successfully but the hash does not match, it will not be applied!");
                         packNotReady(packEntry);
-                        ToastManager.fail(packEntry.name, "Pack is corrupted!");
+                        ToastManager.fail(packEntry.name, "The resource pack is corrupted!");
                     } else {
                         markPackAsReady(packEntry);
                         ServerLockManager.reloadPackDueToUpdate();
+                        
                     }
                 } else {
                     logPackWarn(packEntry, "Failed to download resource pack!");

@@ -6,7 +6,8 @@
   "name": "Resource Pack Helper",
   "description": "Download and update resource pack in a managed way.",
   "authors": [
-    "LX86"
+    "LX86",
+    "Dooji"
   ],
   "contact": {
     "homepage": "",

@@ -11,7 +11,9 @@ import net.minecraft.util.Identifier;
 
 @Environment(EnvType.CLIENT)
 public class CustomToast implements Toast {
-    private static final Identifier CUSTOM_BACKGROUND_TEXTURE = new Identifier("jbrph", "textures/custom_toast.png");
+    private final Identifier backgroundTexture;
+    private final int textureWidth;
+    private final int textureHeight;
     private Text title;
     private Text description;
     public long duration;
@@ -20,26 +22,31 @@ public class CustomToast implements Toast {
     public long time;
     public boolean hidden;
 
-    public CustomToast(Text title, Text description, long duration, int titleColor, int descriptionColor) {
+    public CustomToast(Text title, Text description, long duration, int titleColor, int descriptionColor,
+                       Identifier backgroundTexture, int textureWidth, int textureHeight) {
         this.title = title;
         this.description = description;
         this.duration = duration;
         this.titleColor = titleColor;
         this.descriptionColor = descriptionColor;
+        this.backgroundTexture = backgroundTexture;
+        this.textureWidth = textureWidth;
+        this.textureHeight = textureHeight;
         this.time = 0;
         this.hidden = false;
     }
 
     @Override
     public Visibility draw(MatrixStack matrices, ToastManager manager, long currentTime) {  
-        RenderSystem.setShaderTexture(0, CUSTOM_BACKGROUND_TEXTURE);
-        manager.drawTexture(matrices, 0, 0, 0, 0, 180, 34, 180, 34);
+        RenderSystem.setShaderTexture(0, backgroundTexture);
+        manager.drawTexture(matrices, 0, 0, 0, 0, textureWidth, textureHeight, textureWidth, textureHeight);
     
         manager.getClient().textRenderer.draw(matrices, this.title, 44, 7, this.titleColor);
         manager.getClient().textRenderer.draw(matrices, this.description, 44, 18, this.descriptionColor);
     
-        if (hidden == false) {
-        time += 1;}
+        if (!hidden) {
+            time += 1;
+        }
         System.out.println(time);
         if (time >= duration) {
             hidden = true;
@@ -51,12 +58,12 @@ public class CustomToast implements Toast {
 
     @Override
     public int getWidth() {
-        return 180;
+        return textureWidth;
     }
 
     @Override
     public int getHeight() {
-        return 32;
+        return textureHeight;
     }
 
     @Override

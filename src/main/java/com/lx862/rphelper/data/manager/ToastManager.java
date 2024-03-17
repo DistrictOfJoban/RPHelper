@@ -4,6 +4,7 @@ import com.lx862.rphelper.Util;
 import com.lx862.rphelper.data.EnqueuedToast;
 import com.lx862.rphelper.data.PackEntry;
 import com.lx862.rphelper.custom.CustomToast;
+import com.lx862.rphelper.config.Config;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 
@@ -27,7 +28,7 @@ public class ToastManager {
         CustomToast newToast = new CustomToast(
                 Text.translatable("gui.jbrph.rpdownload.title"),
                 Text.translatable("gui.jbrph.rpdownload.description1"),
-                10000L, 0xFFFFFFFF, 0xFFFFFFFF);
+                Config.getDuration(), Config.getNormalTitleColor(), Config.getNormalDescriptionColor(), Config.getNormalTexture(), Config.getWidth(), Config.getHeight());
         downloadToasts.put(packEntry.uniqueId(), newToast);
         MinecraftClient.getInstance().getToastManager().add(newToast);
     }
@@ -54,8 +55,7 @@ public class ToastManager {
                 new CustomToast(
                         Text.translatable("gui.jbrph.rpupdate.title", entry.name),
                         Text.translatable("gui.jbrph.rpupdate.uptodate"),
-                        0L, 0xFFFFFFFF, 0xFFFFFFFF
-                )
+                        Config.getDuration(), Config.getNormalTitleColor(), Config.getNormalDescriptionColor(), Config.getNormalTexture(), Config.getWidth(), Config.getHeight())
         );
     }
 

@@ -3,6 +3,7 @@ package com.lx862.rphelper.config;
 import com.google.gson.*;
 import com.lx862.rphelper.data.PackEntry;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.util.Identifier;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,6 +14,16 @@ public class Config {
     private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("jbrph.json");
     private static final List<PackEntry> packEntries = new ArrayList<>();
     private static int requestTimeoutSec = 10;
+
+    private static Texture normalTexture = new Texture("jbrph", "textures/normal_texture.png");
+    private static Texture errorTexture = new Texture("jbrph", "textures/error_texture.png");
+    private static int normalTitleColor = 0xFFFFFF;
+    private static int normalDescriptionColor = 0xFFFFFF;
+    private static int errorTitleColor = 0xFF0000;
+    private static int errorDescriptionColor = 0xFF0000;
+    private static int width = 180;
+    private static int height = 32;
+    private static long duration = 5000L;
 
     public static void load() {
         if(!Files.exists(CONFIG_PATH)) {
@@ -32,6 +43,31 @@ public class Config {
             });
 
             requestTimeoutSec = jsonObject.get("requestTimeoutSec").getAsInt();
+
+            if (!jsonObject.has("appearance")) {
+                JsonObject defaultAppearance = createDefaultAppearance();
+                jsonObject.add("appearance", defaultAppearance);
+                Files.writeString(CONFIG_PATH, new GsonBuilder().setPrettyPrinting().create().toJson(jsonObject));
+            }
+
+            JsonObject appearanceObject = jsonObject.getAsJsonObject("appearance");
+            if (appearanceObject != null) {
+                normalTexture = new Texture(
+                        appearanceObject.getAsJsonObject("normal_texture").get("namespace").getAsString(),
+                        appearanceObject.getAsJsonObject("normal_texture").get("texture_path").getAsString()
+                );
+                errorTexture = new Texture(
+                        appearanceObject.getAsJsonObject("error_texture").get("namespace").getAsString(),
+                        appearanceObject.getAsJsonObject("error_texture").get("texture_path").getAsString()
+                );
+                normalTitleColor = hexToDecimal(appearanceObject.get("normal_title_color").getAsString());
+                normalDescriptionColor = hexToDecimal(appearanceObject.get("normal_description_color").getAsString());
+                errorTitleColor = hexToDecimal(appearanceObject.get("error_title_color").getAsString());
+                errorDescriptionColor = hexToDecimal(appearanceObject.get("error_description_color").getAsString());
+                width = appearanceObject.get("width").getAsInt();
+                height = appearanceObject.get("height").getAsInt();
+                duration = appearanceObject.get("duration").getAsLong();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -48,10 +84,49 @@ public class Config {
             jsonObject.add("packs", entryArray);
             jsonObject.addProperty("requestTimeoutSec", requestTimeoutSec);
 
+            JsonObject defaultAppearance = createDefaultAppearance();
+            jsonObject.add("appearance", defaultAppearance);
+
             Files.writeString(CONFIG_PATH, new GsonBuilder().setPrettyPrinting().create().toJson(jsonObject));
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static Identifier getNormalTexture() {
+        return normalTexture.toIdentifier();
+    }
+
+    public static Identifier getErrorTexture() {
+        return errorTexture.toIdentifier();
+    }
+
+    public static int getNormalTitleColor() {
+        return normalTitleColor;
+    }
+
+    public static int getNormalDescriptionColor() {
+        return normalDescriptionColor;
+    }
+
+    public static int getErrorTitleColor() {
+        return errorTitleColor;
+    }
+
+    public static int getErrorDescriptionColor() {
+        return errorDescriptionColor;
+    }
+
+    public static int getWidth() {
+        return width;
+    }
+
+    public static int getHeight() {
+        return height;
+    }
+
+    public static long getDuration() {
+        return duration;
     }
 
     public static List<PackEntry> getPackEntries() {
@@ -69,5 +144,37 @@ public class Config {
 
     public static boolean havePackEntryWithUrl(String url) {
         return packEntries.stream().anyMatch(e -> e.sourceUrl.toString().equals(url));
+    }
+
+    private static String decimalToHex(int decimal) {
+        return "0x" + Integer.toHexString(decimal).toUpperCase();
+    }
+
+    private static int hexToDecimal(String hex) {
+        return Integer.decode(hex);
+    }
+
+    private static JsonObject createDefaultAppearance() {
+        JsonObject appearanceObject = new JsonObject();
+    
+        JsonObject normalTextureObject = new JsonObject();
+        normalTextureObject.addProperty("namespace", normalTexture.getNamespace());
+        normalTextureObject.addProperty("texture_path", normalTexture.getTexturePath());
+        appearanceObject.add("normal_texture", normalTextureObject);
+    
+        JsonObject errorTextureObject = new JsonObject();
+        errorTextureObject.addProperty("namespace", errorTexture.getNamespace());
+        errorTextureObject.addProperty("texture_path", errorTexture.getTexturePath());
+        appearanceObject.add("error_texture", errorTextureObject);
+    
+        appearanceObject.addProperty("normal_title_color", decimalToHex(normalTitleColor));
+        appearanceObject.addProperty("normal_description_color", decimalToHex(normalDescriptionColor));
+        appearanceObject.addProperty("error_title_color", decimalToHex(errorTitleColor));
+        appearanceObject.addProperty("error_description_color", decimalToHex(errorDescriptionColor));
+        appearanceObject.addProperty("width", width);
+        appearanceObject.addProperty("height", height);
+        appearanceObject.addProperty("duration", duration);
+    
+        return appearanceObject;
     }
 }
