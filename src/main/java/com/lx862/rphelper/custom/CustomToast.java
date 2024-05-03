@@ -47,7 +47,7 @@ public class CustomToast implements Toast {
         if (!hidden) {
             time += 1;
         }
-        System.out.println(time);
+
         if (time >= duration) {
             hidden = true;
             return Visibility.HIDE;
