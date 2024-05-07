@@ -16,6 +16,6 @@ public class EnqueuedToast {
     }
 
 	public CustomToast construct() {
-        return new CustomToast(title, description, Config.getDuration(), Config.getErrorTitleColor(), Config.getErrorDescriptionColor(), Config.getErrorTexture(), Config.getWidth(), Config.getHeight());
+        return new CustomToast(title, description, Config.getDuration(), Config.getErrorTitleColor(), Config.getErrorDescriptionColor(), Config.getErrorTexture(), Config.getIconTexture(), Config.getIconSize(), Config.getWidth(), Config.getHeight());
     }
 }

@@ -28,7 +28,7 @@ public class ToastManager {
         CustomToast newToast = new CustomToast(
                 Text.translatable("gui.jbrph.rpdownload.title"),
                 Text.translatable("gui.jbrph.rpdownload.description1"),
-                Config.getDuration(), Config.getNormalTitleColor(), Config.getNormalDescriptionColor(), Config.getNormalTexture(), Config.getWidth(), Config.getHeight());
+                Config.getDuration(), Config.getNormalTitleColor(), Config.getNormalDescriptionColor(), Config.getNormalTexture(), Config.getIconTexture(), Config.getIconSize(), Config.getWidth(), Config.getHeight());
         downloadToasts.put(packEntry.uniqueId(), newToast);
         MinecraftClient.getInstance().getToastManager().add(newToast);
     }
@@ -55,7 +55,7 @@ public class ToastManager {
                 new CustomToast(
                         Text.translatable("gui.jbrph.rpupdate.title", entry.name),
                         Text.translatable("gui.jbrph.rpupdate.uptodate"),
-                        Config.getDuration(), Config.getNormalTitleColor(), Config.getNormalDescriptionColor(), Config.getNormalTexture(), Config.getWidth(), Config.getHeight())
+                        Config.getDuration(), Config.getNormalTitleColor(), Config.getNormalDescriptionColor(), Config.getNormalTexture(), Config.getIconTexture(), Config.getIconSize(), Config.getWidth(), Config.getHeight())
         );
     }
 

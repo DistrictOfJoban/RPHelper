@@ -17,6 +17,8 @@ public class Config {
 
     private static Texture normalTexture = new Texture("jbrph", "textures/normal_texture.png");
     private static Texture errorTexture = new Texture("jbrph", "textures/error_texture.png");
+    private static Texture iconTexture = new Texture("jbrph", "textures/icon_texture.png");
+    private static int iconSize = 25;
     private static int normalTitleColor = 0xFFFFFF;
     private static int normalDescriptionColor = 0xFFFFFF;
     private static int errorTitleColor = 0xFF0000;
@@ -60,6 +62,11 @@ public class Config {
                         appearanceObject.getAsJsonObject("error_texture").get("namespace").getAsString(),
                         appearanceObject.getAsJsonObject("error_texture").get("texture_path").getAsString()
                 );
+                iconTexture = new Texture(
+                    appearanceObject.getAsJsonObject("icon_texture").get("icon_namespace").getAsString(),
+                    appearanceObject.getAsJsonObject("icon_texture").get("icon_path").getAsString()
+                );
+                iconSize = appearanceObject.get("icon_size").getAsInt();
                 normalTitleColor = hexToDecimal(appearanceObject.get("normal_title_color").getAsString());
                 normalDescriptionColor = hexToDecimal(appearanceObject.get("normal_description_color").getAsString());
                 errorTitleColor = hexToDecimal(appearanceObject.get("error_title_color").getAsString());
@@ -99,6 +106,14 @@ public class Config {
 
     public static Identifier getErrorTexture() {
         return errorTexture.toIdentifier();
+    }
+
+    public static Identifier getIconTexture() {
+        return iconTexture.toIdentifier();
+    }
+
+    public static int getIconSize() {
+        return iconSize;
     }
 
     public static int getNormalTitleColor() {
@@ -166,7 +181,13 @@ public class Config {
         errorTextureObject.addProperty("namespace", errorTexture.getNamespace());
         errorTextureObject.addProperty("texture_path", errorTexture.getTexturePath());
         appearanceObject.add("error_texture", errorTextureObject);
-    
+
+        JsonObject iconTextureObject = new JsonObject();
+        iconTextureObject.addProperty("icon_namespace", iconTexture.getNamespace());
+        iconTextureObject.addProperty("icon_path", iconTexture.getTexturePath());
+        appearanceObject.add("icon_texture", iconTextureObject);
+
+        appearanceObject.addProperty("icon_size", iconSize);
         appearanceObject.addProperty("normal_title_color", decimalToHex(normalTitleColor));
         appearanceObject.addProperty("normal_description_color", decimalToHex(normalDescriptionColor));
         appearanceObject.addProperty("error_title_color", decimalToHex(errorTitleColor));

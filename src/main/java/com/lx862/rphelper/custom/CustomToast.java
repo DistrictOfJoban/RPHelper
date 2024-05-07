@@ -12,7 +12,10 @@ import net.minecraft.util.Identifier;
 @Environment(EnvType.CLIENT)
 public class CustomToast implements Toast {
     private final Identifier backgroundTexture;
-    private final int textureWidth;
+    private final Identifier iconTexture;
+    private final int iconSize;
+    private int textureWidth;
+    private final int configTextureWidth;
     private final int textureHeight;
     private Text title;
     private Text description;
@@ -23,13 +26,16 @@ public class CustomToast implements Toast {
     public boolean hidden;
 
     public CustomToast(Text title, Text description, long duration, int titleColor, int descriptionColor,
-                       Identifier backgroundTexture, int textureWidth, int textureHeight) {
+                       Identifier backgroundTexture, Identifier iconTexture, int iconSize, int textureWidth, int textureHeight) {
         this.title = title;
         this.description = description;
         this.duration = duration;
         this.titleColor = titleColor;
         this.descriptionColor = descriptionColor;
         this.backgroundTexture = backgroundTexture;
+        this.iconTexture = iconTexture;
+        this.iconSize = iconSize;
+        this.configTextureWidth = textureWidth;
         this.textureWidth = textureWidth;
         this.textureHeight = textureHeight;
         this.time = 0;
@@ -39,7 +45,10 @@ public class CustomToast implements Toast {
     @Override
     public Visibility draw(MatrixStack matrices, ToastManager manager, long currentTime) {  
         RenderSystem.setShaderTexture(0, backgroundTexture);
-        manager.drawTexture(matrices, 0, 0, 0, 0, textureWidth, textureHeight, textureWidth, textureHeight);
+        manager.drawTexture(matrices, 0, 0, 0, 0, getWidth(), textureHeight, textureWidth, textureHeight);
+
+        RenderSystem.setShaderTexture(0, iconTexture);
+        manager.drawTexture(matrices, 10, (textureHeight - iconSize) / 2, 0, 0, iconSize, iconSize, iconSize, iconSize);
     
         manager.getClient().textRenderer.draw(matrices, this.title, 44, 7, this.titleColor);
         manager.getClient().textRenderer.draw(matrices, this.description, 44, 18, this.descriptionColor);
@@ -58,8 +67,18 @@ public class CustomToast implements Toast {
 
     @Override
     public int getWidth() {
-        return textureWidth;
+        int titleLength = countCharacters(title);
+        int descriptionLength = countCharacters(description);
+        int contentLength = Math.max(titleLength, descriptionLength);
+
+        if (contentLength > 22 && this.textureWidth < (contentLength - 22) * 5 + configTextureWidth) {
+            int extraWidth = contentLength - 22;
+            this.textureWidth += extraWidth * 5;
+        }
+        
+        return this.textureWidth;
     }
+    
 
     @Override
     public int getHeight() {
@@ -74,5 +93,16 @@ public class CustomToast implements Toast {
     public void setContent(Text title, Text description) {
         this.title = title;
         this.description = description;
+    }
+
+    private int countCharacters(Text text) {
+        int count = 0;
+        String string = text.getString();
+        for (int i = 0; i < string.length(); i++) {
+            if (string.codePointAt(i) < 128) {
+                count++;
+            }
+        }
+        return count;
     }
 }
