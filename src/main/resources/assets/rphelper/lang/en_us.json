@@ -1,0 +1,9 @@
+{
+  "gui.rphelper.rpfail.title": "Pack failed!",
+  "gui.rphelper.rpfail.description": "%s > %s",
+  "gui.rphelper.rpupdate.title": "Pack Update: %s",
+  "gui.rphelper.rpupdate.uptodate": "Resource pack is up to date!",
+  "gui.rphelper.rpdownload.title": "Downloading pack",
+  "gui.rphelper.rpdownload.description1": "Please wait...",
+  "gui.rphelper.rpdownload.description2": "%s > %f%% done."
+}

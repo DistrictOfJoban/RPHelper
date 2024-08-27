@@ -5,7 +5,6 @@ import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
 import com.lx862.rphelper.config.Config;
-import com.lx862.rphelper.custom.CustomToast;
 
 public class EnqueuedToast {
     private final Text title;

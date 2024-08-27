@@ -1,6 +1,7 @@
 package com.lx862.rphelper.config;
 
 import com.google.gson.*;
+import com.lx862.rphelper.RPHelper;
 import com.lx862.rphelper.data.PackEntry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Identifier;
@@ -15,9 +16,10 @@ public class Config {
     private static final List<PackEntry> packEntries = new ArrayList<>();
     private static int requestTimeoutSec = 10;
 
-    private static Texture normalTexture = new Texture("jbrph", "textures/normal_texture.png");
-    private static Texture errorTexture = new Texture("jbrph", "textures/error_texture.png");
-    private static Texture iconTexture = new Texture("jbrph", "textures/icon_texture.png");
+    private static Identifier normalTexture = RPHelper.id("textures/normal_texture.png");
+    private static Identifier errorTexture = RPHelper.id("textures/error_texture.png");
+    private static Identifier iconTexture = RPHelper.id("textures/icon_texture.png");
+
     private static int iconSize = 25;
     private static int normalTitleColor = 0xFFFFFF;
     private static int normalDescriptionColor = 0xFFFFFF;
@@ -54,15 +56,15 @@ public class Config {
 
             JsonObject appearanceObject = jsonObject.getAsJsonObject("appearance");
             if (appearanceObject != null) {
-                normalTexture = new Texture(
+                normalTexture = new Identifier(
                         appearanceObject.getAsJsonObject("normal_texture").get("namespace").getAsString(),
                         appearanceObject.getAsJsonObject("normal_texture").get("texture_path").getAsString()
                 );
-                errorTexture = new Texture(
+                errorTexture = new Identifier(
                         appearanceObject.getAsJsonObject("error_texture").get("namespace").getAsString(),
                         appearanceObject.getAsJsonObject("error_texture").get("texture_path").getAsString()
                 );
-                iconTexture = new Texture(
+                iconTexture = new Identifier(
                     appearanceObject.getAsJsonObject("icon_texture").get("icon_namespace").getAsString(),
                     appearanceObject.getAsJsonObject("icon_texture").get("icon_path").getAsString()
                 );
@@ -101,15 +103,15 @@ public class Config {
     }
 
     public static Identifier getNormalTexture() {
-        return normalTexture.toIdentifier();
+        return normalTexture;
     }
 
     public static Identifier getErrorTexture() {
-        return errorTexture.toIdentifier();
+        return errorTexture;
     }
 
     public static Identifier getIconTexture() {
-        return iconTexture.toIdentifier();
+        return iconTexture;
     }
 
     public static int getIconSize() {
@@ -174,17 +176,17 @@ public class Config {
     
         JsonObject normalTextureObject = new JsonObject();
         normalTextureObject.addProperty("namespace", normalTexture.getNamespace());
-        normalTextureObject.addProperty("texture_path", normalTexture.getTexturePath());
+        normalTextureObject.addProperty("texture_path", normalTexture.getPath());
         appearanceObject.add("normal_texture", normalTextureObject);
     
         JsonObject errorTextureObject = new JsonObject();
         errorTextureObject.addProperty("namespace", errorTexture.getNamespace());
-        errorTextureObject.addProperty("texture_path", errorTexture.getTexturePath());
+        errorTextureObject.addProperty("texture_path", errorTexture.getPath());
         appearanceObject.add("error_texture", errorTextureObject);
 
         JsonObject iconTextureObject = new JsonObject();
         iconTextureObject.addProperty("icon_namespace", iconTexture.getNamespace());
-        iconTextureObject.addProperty("icon_path", iconTexture.getTexturePath());
+        iconTextureObject.addProperty("icon_path", iconTexture.getPath());
         appearanceObject.add("icon_texture", iconTextureObject);
 
         appearanceObject.addProperty("icon_size", iconSize);

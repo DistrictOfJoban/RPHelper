@@ -24,7 +24,17 @@ public class PackManager {
         for(PackEntry packEntry : Config.getPackEntries()) {
             File packFile = RESOURCE_PACK_LOCATION.resolve(packEntry.getFileName()).toFile();
 
-            HashComparisonResult hashResult = HashManager.compareRemoteHash(packEntry, packFile, true);
+            HashComparisonResult hashResult;
+            if(packEntry.hashUrl != null) {
+                hashResult = HashManager.compareRemoteHash(packEntry, packFile, true);
+            } else {
+                if(packEntry.hash == null) {
+                    hashResult = HashComparisonResult.NOT_AVAIL;
+                } else {
+                    hashResult = packEntry.hash.equals(HashManager.getFileHash(packFile)) ? HashComparisonResult.MATCH : HashComparisonResult.MISMATCH;
+                }
+            }
+
             if (hashResult == HashComparisonResult.MATCH) {
                 // Up to date
                 markPackAsReady(packEntry);

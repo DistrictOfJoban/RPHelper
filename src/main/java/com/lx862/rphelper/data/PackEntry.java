@@ -9,20 +9,22 @@ import java.util.Objects;
 
 public class PackEntry {
     public final URL sourceUrl;
+    public final @Nullable String hash;
     public final @Nullable URL hashUrl;
     private final String fileName;
     public final String name;
 
-    public PackEntry(@Nullable String name, String sourceUrl, @Nullable String hashUrl, String fileName) throws MalformedURLException {
+    public PackEntry(@Nullable String name, String sourceUrl, @Nullable String hash, @Nullable String hashUrl, String fileName) throws MalformedURLException {
         if(sourceUrl == null || fileName == null) throw new IllegalArgumentException("sourceURL and fileName must not be null!");
         this.sourceUrl = new URL(sourceUrl);
+        this.hash = hash;
         this.hashUrl = hashUrl == null ? null : new URL(hashUrl);
         this.fileName = fileName;
         this.name = name == null ? fileName : name;
     }
 
     public String uniqueId() {
-        return this.sourceUrl + (this.hashUrl == null ? "" : this.hashUrl.toString()) + this.fileName;
+        return this.sourceUrl + (this.hashUrl == null ? this.hash : this.hashUrl.toString()) + this.fileName;
     }
 
     public String getFileName() {

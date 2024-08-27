@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "jbrph",
+  "id": "rphelper",
   "version": "${version}",
 
   "name": "Resource Pack Helper",
@@ -11,11 +11,11 @@
   ],
   "contact": {
     "homepage": "",
-    "sources": "https://github.com/DistrictOfJoban/JobanRPHelper"
+    "sources": "https://github.com/DistrictOfJoban/RPHelper"
   },
 
   "license": "MIT",
-  "icon": "assets/jbrph/icon.png",
+  "icon": "assets/rphelper/icon.png",
 
   "environment": "*",
   "entrypoints": {
@@ -27,9 +27,9 @@
     ]
   },
   "mixins": [
-    "jbrph.mixin.json"
+    "rphelper.mixin.json"
   ],
   "depends": {
-    "minecraft": ">=1.19"
+    "minecraft": ">=1.19.2"
   }
 }

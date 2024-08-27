@@ -1,4 +1,4 @@
-package com.lx862.rphelper.custom;
+package com.lx862.rphelper.data;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;

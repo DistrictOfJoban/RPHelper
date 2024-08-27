@@ -1,5 +1,6 @@
 package com.lx862.rphelper.network;
 
+import com.lx862.rphelper.RPHelper;
 import com.lx862.rphelper.data.Log;
 import com.lx862.rphelper.data.manager.PackManager;
 import com.lx862.rphelper.data.manager.ServerLockManager;
@@ -10,7 +11,7 @@ import net.minecraft.util.Identifier;
 import java.util.concurrent.CompletableFuture;
 
 public class Packets {
-    public static final Identifier SEND_UPDATE_RP = new Identifier("jbrph", "rp_updated");
+    public static final Identifier SEND_UPDATE_RP = RPHelper.id("rp_updated");
 
     public static void registerClient() {
         ClientPlayConnectionEvents.JOIN.register((networkHandler, packetSender, client) -> {

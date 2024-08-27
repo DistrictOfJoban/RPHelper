@@ -3,7 +3,7 @@ package com.lx862.rphelper.data.manager;
 import com.lx862.rphelper.Util;
 import com.lx862.rphelper.data.EnqueuedToast;
 import com.lx862.rphelper.data.PackEntry;
-import com.lx862.rphelper.custom.CustomToast;
+import com.lx862.rphelper.data.CustomToast;
 import com.lx862.rphelper.config.Config;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
@@ -26,8 +26,8 @@ public class ToastManager {
         if(!readyToSendToast) return;
 
         CustomToast newToast = new CustomToast(
-                Text.translatable("gui.jbrph.rpdownload.title"),
-                Text.translatable("gui.jbrph.rpdownload.description1"),
+                Text.translatable("gui.rphelper.rpdownload.title"),
+                Text.translatable("gui.rphelper.rpdownload.description1"),
                 Config.getDuration(), Config.getNormalTitleColor(), Config.getNormalDescriptionColor(), Config.getNormalTexture(), Config.getIconTexture(), Config.getIconSize(), Config.getWidth(), Config.getHeight());
         downloadToasts.put(packEntry.uniqueId(), newToast);
         MinecraftClient.getInstance().getToastManager().add(newToast);
@@ -38,8 +38,8 @@ public class ToastManager {
         if(toast == null) return;
 
         toast.setContent(
-                Text.translatable("gui.jbrph.rpdownload.title"),
-                Text.translatable("gui.jbrph.rpdownload.description2", packEntry.name, Util.get1DecPlace(progress * 100))
+                Text.translatable("gui.rphelper.rpdownload.title"),
+                Text.translatable("gui.rphelper.rpdownload.description2", packEntry.name, Util.get1DecPlace(progress * 100))
         );
 
         if (progress >= 1.0) {
@@ -53,8 +53,8 @@ public class ToastManager {
 
         MinecraftClient.getInstance().getToastManager().add(
                 new CustomToast(
-                        Text.translatable("gui.jbrph.rpupdate.title", entry.name),
-                        Text.translatable("gui.jbrph.rpupdate.uptodate"),
+                        Text.translatable("gui.rphelper.rpupdate.title", entry.name),
+                        Text.translatable("gui.rphelper.rpupdate.uptodate"),
                         Config.getDuration(), Config.getNormalTitleColor(), Config.getNormalDescriptionColor(), Config.getNormalTexture(), Config.getIconTexture(), Config.getIconSize(), Config.getWidth(), Config.getHeight())
         );
     }
@@ -62,8 +62,8 @@ public class ToastManager {
     public static void fail(String packName, String reason) {
         queueToast(
                 new EnqueuedToast(
-                        Text.translatable("gui.jbrph.rpfail.title"),
-                        Text.translatable("gui.jbrph.rpfail.description", packName, reason)
+                        Text.translatable("gui.rphelper.rpfail.title"),
+                        Text.translatable("gui.rphelper.rpfail.description", packName, reason)
                 )
         );
     }
