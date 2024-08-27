@@ -95,6 +95,7 @@ public class CustomToast implements Toast {
     public void setContent(Text title, Text description) {
         this.title = title;
         this.description = description;
+        time = 0; // Reset toast duration, as we can download for an unknown amount of time
     }
 
     private int countCharacters(Text text) {
