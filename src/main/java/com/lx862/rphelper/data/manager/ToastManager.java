@@ -49,8 +49,6 @@ public class ToastManager {
     }
 
     public static void upToDate(PackEntry entry) {
-        if(!readyToSendToast) return;
-
         MinecraftClient.getInstance().getToastManager().add(
                 new CustomToast(
                         Text.translatable("gui.rphelper.rpupdate.title", entry.name),

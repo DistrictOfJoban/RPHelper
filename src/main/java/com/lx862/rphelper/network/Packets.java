@@ -26,7 +26,7 @@ public class Packets {
                 if(client.player == null) return;
 
                 CompletableFuture.runAsync(() -> {
-                    PackManager.downloadOrUpdate();
+                    PackManager.downloadOrUpdate(false);
                 });
             });
         });

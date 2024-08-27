@@ -24,6 +24,7 @@ public class CustomToast implements Toast {
     private final int descriptionColor;
     public long time;
     public boolean hidden;
+    private long lastElapsed = System.currentTimeMillis();
 
     public CustomToast(Text title, Text description, long duration, int titleColor, int descriptionColor,
                        Identifier backgroundTexture, Identifier iconTexture, int iconSize, int textureWidth, int textureHeight) {
@@ -54,7 +55,8 @@ public class CustomToast implements Toast {
         manager.getClient().textRenderer.draw(matrices, this.description, 44, 18, this.descriptionColor);
     
         if (!hidden) {
-            time += 1;
+            time += System.currentTimeMillis() - lastElapsed;
+            lastElapsed = System.currentTimeMillis();
         }
 
         if (time >= duration) {

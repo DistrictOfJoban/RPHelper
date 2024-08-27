@@ -7,20 +7,15 @@ import com.lx862.rphelper.data.Log;
 import com.lx862.rphelper.data.PackEntry;
 import com.lx862.rphelper.network.DownloadManager;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
 
 import java.io.*;
 import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public class PackManager {
     public static final Path RESOURCE_PACK_LOCATION = FabricLoader.getInstance().getGameDir().resolve("resourcepacks");
-    public static boolean stillDownloading = false;
-    private static final Set<String> readyToBeUsedPacks = new HashSet<>();
 
-    public static void downloadOrUpdate() {
+    public static void downloadOrUpdate(boolean init) {
         for(PackEntry packEntry : Config.getPackEntries()) {
             File packFile = RESOURCE_PACK_LOCATION.resolve(packEntry.getFileName()).toFile();
 
@@ -35,13 +30,10 @@ public class PackManager {
                 }
             }
 
-            if (hashResult == HashComparisonResult.MATCH) {
+            if (hashResult == HashComparisonResult.MATCH || hashResult == HashComparisonResult.NOT_AVAIL) {
                 // Up to date
-                markPackAsReady(packEntry);
-
-                MinecraftClient.getInstance().execute(() -> {
-                    ToastManager.upToDate(packEntry);
-                });
+                packEntry.ready = true;
+                if(!init) ToastManager.upToDate(packEntry);
             } else {
                 CompletableFuture.runAsync(() -> {
                     // Download
@@ -69,26 +61,22 @@ public class PackManager {
                 }
 
                 ToastManager.updateDownloadToastProgress(packEntry, prg);
-                PackManager.stillDownloading = true;
             }, (errorMsg) -> {
-                PackManager.stillDownloading = false;
-
                 if(errorMsg == null) {
                     ToastManager.updateDownloadToastProgress(packEntry, 1);
                     logPackInfo(packEntry, "The resource pack has been downloaded successfully!");
 
                     if(HashManager.compareRemoteHash(packEntry, outputLocation) == HashComparisonResult.MISMATCH) {
                         logPackWarn(packEntry, "The resource pack has been downloaded successfully but the hash does not match, it will not be applied!");
-                        packNotReady(packEntry);
+                        packEntry.ready = false;
                         ToastManager.fail(packEntry.name, "The resource pack is corrupted!");
                     } else {
-                        markPackAsReady(packEntry);
+                        packEntry.ready = true;
                         ServerLockManager.reloadPackDueToUpdate();
-                        
                     }
                 } else {
                     logPackWarn(packEntry, "Failed to download resource pack!");
-                    packNotReady(packEntry);
+                    packEntry.ready = false;
                     ToastManager.fail(packEntry.name, errorMsg);
                 }
             });
@@ -97,16 +85,8 @@ public class PackManager {
         }
     }
 
-    private static void markPackAsReady(PackEntry packEntry) {
-        readyToBeUsedPacks.add(packEntry.uniqueId());
-    }
-
     private static void packNotReady(PackEntry packEntry) {
-        readyToBeUsedPacks.remove(packEntry.uniqueId());
-    }
-
-    public static boolean isPackReady(PackEntry entry) {
-        return readyToBeUsedPacks.contains(entry.uniqueId());
+        packEntry.ready = false;
     }
 
     public static void logPackInfo(PackEntry entry, String content) {

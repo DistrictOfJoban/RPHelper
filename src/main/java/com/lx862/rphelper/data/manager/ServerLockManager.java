@@ -39,9 +39,7 @@ public class ServerLockManager {
         if(mc.options == null) return;
 
         for(PackEntry packEntry : Config.getPackEntries()) {
-            if(!PackManager.isPackReady(packEntry)) {
-                return;
-            }
+            if(!packEntry.ready) continue;
 
             String packName = "file/" + packEntry.getFileName();
             ServerInfo currentServerEntry = mc.getCurrentServerEntry();

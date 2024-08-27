@@ -11,8 +11,9 @@ public class PackEntry {
     public final URL sourceUrl;
     public final @Nullable String hash;
     public final @Nullable URL hashUrl;
-    private final String fileName;
     public final String name;
+    public boolean ready = false;
+    private final String fileName;
 
     public PackEntry(@Nullable String name, String sourceUrl, @Nullable String hash, @Nullable String hashUrl, String fileName) throws MalformedURLException {
         if(sourceUrl == null || fileName == null) throw new IllegalArgumentException("sourceURL and fileName must not be null!");
