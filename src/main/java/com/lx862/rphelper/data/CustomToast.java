@@ -3,6 +3,7 @@ package com.lx862.rphelper.data;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.toast.Toast;
 import net.minecraft.client.toast.ToastManager;
 import net.minecraft.client.util.math.MatrixStack;
@@ -22,7 +23,7 @@ public class CustomToast implements Toast {
     public long duration;
     private final int titleColor;
     private final int descriptionColor;
-    public long time;
+    public long elapsedTime;
     public boolean hidden;
     private long lastElapsed = System.currentTimeMillis();
 
@@ -39,32 +40,25 @@ public class CustomToast implements Toast {
         this.configTextureWidth = textureWidth;
         this.textureWidth = textureWidth;
         this.textureHeight = textureHeight;
-        this.time = 0;
+        this.elapsedTime = 0;
         this.hidden = false;
     }
 
     @Override
     public Visibility draw(MatrixStack matrices, ToastManager manager, long currentTime) {  
         RenderSystem.setShaderTexture(0, backgroundTexture);
-        manager.drawTexture(matrices, 0, 0, 0, 0, getWidth(), textureHeight, textureWidth, textureHeight);
+        DrawableHelper.drawTexture(matrices, 0, 0, 0, 0, getWidth(), textureHeight, textureWidth, textureHeight);
 
         RenderSystem.setShaderTexture(0, iconTexture);
-        manager.drawTexture(matrices, 10, (textureHeight - iconSize) / 2, 0, 0, iconSize, iconSize, iconSize, iconSize);
+        DrawableHelper.drawTexture(matrices, 10, (textureHeight - iconSize) / 2, 0, 0, iconSize, iconSize, iconSize, iconSize);
     
         manager.getClient().textRenderer.draw(matrices, this.title, 44, 7, this.titleColor);
         manager.getClient().textRenderer.draw(matrices, this.description, 44, 18, this.descriptionColor);
-    
-        if (!hidden) {
-            time += System.currentTimeMillis() - lastElapsed;
-            lastElapsed = System.currentTimeMillis();
-        }
 
-        if (time >= duration) {
-            hidden = true;
-            return Visibility.HIDE;
-        }
-            
-        return Visibility.SHOW;
+        elapsedTime += System.currentTimeMillis() - lastElapsed;
+        lastElapsed = System.currentTimeMillis();
+
+        return elapsedTime >= duration ? Visibility.HIDE : Visibility.SHOW;
     }  
 
     @Override
@@ -95,7 +89,7 @@ public class CustomToast implements Toast {
     public void setContent(Text title, Text description) {
         this.title = title;
         this.description = description;
-        time = 0; // Reset toast duration, as we can download for an unknown amount of time
+        elapsedTime = 0; // Reset toast duration, as we can download for an unknown amount of time
     }
 
     private int countCharacters(Text text) {

@@ -32,6 +32,18 @@ public class PackEntry {
         return Paths.get(fileName).getFileName().toString();
     }
 
+    public void logInfo(String content) {
+        Log.info("[" + name + "] " + content);
+    }
+
+    public void logWarn(String content) {
+        Log.warn("[" + name + "] " + content);
+    }
+
+    public void logError(String content) {
+        Log.error("[" + name + "] " + content);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if(!(obj instanceof PackEntry)) return false;

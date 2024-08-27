@@ -20,11 +20,6 @@ public class TitleScreenMixin {
     public void render(CallbackInfo ci) {
         if(!toastShown) {
             ToastManager.readyToSendToast();
-            for(PackEntry packEntry : Config.getPackEntries()) {
-                if(!packEntry.ready) {
-                    ToastManager.setupNewDownloadToast(packEntry);
-                }
-            }
             toastShown = true;
         }
     }

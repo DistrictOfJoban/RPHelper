@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Config {
-    private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("jbrph.json");
+    private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("rphelper").resolve("config.json");
     private static final List<PackEntry> packEntries = new ArrayList<>();
     private static int requestTimeoutSec = 10;
 
@@ -31,7 +31,7 @@ public class Config {
 
     public static void load() {
         if(!Files.exists(CONFIG_PATH)) {
-            write();
+            generate();
         }
 
         try {
@@ -56,17 +56,14 @@ public class Config {
 
             JsonObject appearanceObject = jsonObject.getAsJsonObject("appearance");
             if (appearanceObject != null) {
-                normalTexture = new Identifier(
-                        appearanceObject.getAsJsonObject("normal_texture").get("namespace").getAsString(),
-                        appearanceObject.getAsJsonObject("normal_texture").get("texture_path").getAsString()
+                normalTexture = Identifier.tryParse(
+                        appearanceObject.get("normal_texture").getAsString()
                 );
-                errorTexture = new Identifier(
-                        appearanceObject.getAsJsonObject("error_texture").get("namespace").getAsString(),
-                        appearanceObject.getAsJsonObject("error_texture").get("texture_path").getAsString()
+                errorTexture = Identifier.tryParse(
+                        appearanceObject.get("error_texture").getAsString()
                 );
-                iconTexture = new Identifier(
-                    appearanceObject.getAsJsonObject("icon_texture").get("icon_namespace").getAsString(),
-                    appearanceObject.getAsJsonObject("icon_texture").get("icon_path").getAsString()
+                iconTexture = Identifier.tryParse(
+                    appearanceObject.get("icon_texture").getAsString()
                 );
                 iconSize = appearanceObject.get("icon_size").getAsInt();
                 normalTitleColor = hexToDecimal(appearanceObject.get("normal_title_color").getAsString());
@@ -82,7 +79,7 @@ public class Config {
         }
     }
 
-    private static void write() {
+    private static void generate() {
         try {
             JsonObject jsonObject = new JsonObject();
             JsonArray entryArray = new JsonArray();
@@ -96,6 +93,7 @@ public class Config {
             JsonObject defaultAppearance = createDefaultAppearance();
             jsonObject.add("appearance", defaultAppearance);
 
+            CONFIG_PATH.getParent().toFile().mkdirs();
             Files.writeString(CONFIG_PATH, new GsonBuilder().setPrettyPrinting().create().toJson(jsonObject));
         } catch (Exception e) {
             e.printStackTrace();
@@ -173,21 +171,9 @@ public class Config {
 
     private static JsonObject createDefaultAppearance() {
         JsonObject appearanceObject = new JsonObject();
-    
-        JsonObject normalTextureObject = new JsonObject();
-        normalTextureObject.addProperty("namespace", normalTexture.getNamespace());
-        normalTextureObject.addProperty("texture_path", normalTexture.getPath());
-        appearanceObject.add("normal_texture", normalTextureObject);
-    
-        JsonObject errorTextureObject = new JsonObject();
-        errorTextureObject.addProperty("namespace", errorTexture.getNamespace());
-        errorTextureObject.addProperty("texture_path", errorTexture.getPath());
-        appearanceObject.add("error_texture", errorTextureObject);
-
-        JsonObject iconTextureObject = new JsonObject();
-        iconTextureObject.addProperty("icon_namespace", iconTexture.getNamespace());
-        iconTextureObject.addProperty("icon_path", iconTexture.getPath());
-        appearanceObject.add("icon_texture", iconTextureObject);
+        appearanceObject.addProperty("normal_texture", normalTexture.toString());
+        appearanceObject.addProperty("error_texture", errorTexture.toString());
+        appearanceObject.addProperty("icon_texture", iconTexture.toString());
 
         appearanceObject.addProperty("icon_size", iconSize);
         appearanceObject.addProperty("normal_title_color", decimalToHex(normalTitleColor));

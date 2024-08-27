@@ -7,10 +7,15 @@ import com.lx862.rphelper.data.Log;
 import com.lx862.rphelper.data.PackEntry;
 import com.lx862.rphelper.network.DownloadManager;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.resource.ResourcePack;
+import net.minecraft.resource.ResourcePackProfile;
 
 import java.io.*;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 
 public class PackManager {
     public static final Path RESOURCE_PACK_LOCATION = FabricLoader.getInstance().getGameDir().resolve("resourcepacks");
@@ -35,9 +40,9 @@ public class PackManager {
                 packEntry.ready = true;
                 if(!init) ToastManager.upToDate(packEntry);
             } else {
+                // Download
                 CompletableFuture.runAsync(() -> {
-                    // Download
-                    logPackInfo(packEntry, "The resource pack will be downloaded.");
+                    logPackInfo(packEntry, "Will be downloaded.");
 
                     long curTime = System.currentTimeMillis();
                     downloadPack(packEntry, packFile);
@@ -64,13 +69,13 @@ public class PackManager {
             }, (errorMsg) -> {
                 if(errorMsg == null) {
                     ToastManager.updateDownloadToastProgress(packEntry, 1);
-                    logPackInfo(packEntry, "The resource pack has been downloaded successfully!");
 
                     if(HashManager.compareRemoteHash(packEntry, outputLocation) == HashComparisonResult.MISMATCH) {
-                        logPackWarn(packEntry, "The resource pack has been downloaded successfully but the hash does not match, it will not be applied!");
+                        logPackWarn(packEntry, "Resource pack downloaded but the file hash does not match, not applying!");
                         packEntry.ready = false;
-                        ToastManager.fail(packEntry.name, "The resource pack is corrupted!");
+                        ToastManager.fail(packEntry.name, "Hash Mismatch, file might be corrupted.");
                     } else {
+                        logPackInfo(packEntry, "Download successful!");
                         packEntry.ready = true;
                         ServerLockManager.reloadPackDueToUpdate();
                     }
@@ -85,8 +90,18 @@ public class PackManager {
         }
     }
 
-    private static void packNotReady(PackEntry packEntry) {
-        packEntry.ready = false;
+    public static void loopPack(BiConsumer<PackEntry, ResourcePack> callback) {
+        Collection<ResourcePackProfile> profiles = MinecraftClient.getInstance().getResourcePackManager().getProfiles();
+        for(ResourcePackProfile resourcePackProfile : profiles) {
+            PackEntry entry = Config.getPackEntry(resourcePackProfile.getName());
+            if(entry == null) {
+                continue;
+            }
+
+            try (ResourcePack rp = resourcePackProfile.createResourcePack()) {
+                callback.accept(entry, rp);
+            }
+        }
     }
 
     public static void logPackInfo(PackEntry entry, String content) {
@@ -95,9 +110,5 @@ public class PackManager {
 
     public static void logPackWarn(PackEntry entry, String content) {
         Log.warn("[" + entry.name + "] " + content);
-    }
-
-    public static void logPackError(PackEntry entry, String content) {
-        Log.error("[" + entry.name + "] " + content);
     }
 }

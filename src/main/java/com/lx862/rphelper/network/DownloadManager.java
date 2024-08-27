@@ -68,7 +68,6 @@ public class DownloadManager {
 
             File partFile = new File(outputLocation + ".part" + i);
             if(partFile.exists() && partFile.length() == chunkLength) {
-                // Assume the file is downloaded properly, we'll do one final hash check before applying so hopefully this isn't too big of a problem
                 Log.info("Found " + partFile.getName() + ", continuing...");
                 totalDownloaded.addAndGet(PER_CHUNK);
                 continue;
@@ -79,7 +78,7 @@ public class DownloadManager {
 
             while(!success && retryCount < 3) {
                 AtomicInteger thisPartDownloaded = new AtomicInteger();
-                boolean partDownloaded = downloadPart(partFile, url, (byteDownloaded) -> {
+                boolean partDownloaded = NetworkManager.downloadPart(partFile, url, (byteDownloaded) -> {
                     thisPartDownloaded.addAndGet(byteDownloaded);
                     double dlProgress = totalPackSize == -1 ? -1 : (double)(totalDownloaded.get() + thisPartDownloaded.get()) / totalPackSize;
                     callback.accept(dlProgress);
@@ -112,44 +111,5 @@ public class DownloadManager {
         cleanupPartFile(outputLocation, totalParts);
         finishedCallback.accept(successfulSoFar ? null : "Download interrupted!");
         httpUrlConnection.disconnect();
-    }
-
-    public static boolean downloadPart(File outputFile, URL url, Consumer<Integer> callback, long byteOffset, long chunkLength) {
-        int thisDownloaded = 0;
-
-        try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(outputFile))) {
-            HttpURLConnection nhr = (HttpURLConnection) url.openConnection();
-            NetworkManager.setRequestTimeout(nhr);
-
-            // Http Range Support
-            boolean supportRange = byteOffset != -1;
-            if(supportRange) nhr.setRequestProperty("Range", "bytes=" + byteOffset + "-" + (byteOffset + chunkLength));
-
-            try(BufferedInputStream ns = new BufferedInputStream(nhr.getInputStream())) {
-                byte[] dataBuffer = new byte[1024];
-                while(true) {
-                    int nextReadLength = (int)Math.min(chunkLength - thisDownloaded, 1024);
-                    int byteRead = ns.read(dataBuffer, 0, nextReadLength);
-                    if(byteRead == -1 || thisDownloaded >= chunkLength) break;
-
-                    bos.write(dataBuffer, 0, byteRead);
-                    thisDownloaded += byteRead;
-                    callback.accept(byteRead);
-                }
-            } catch (SocketException | SocketTimeoutException e) {
-                Log.error("Timed out while downloading!");
-                return false;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false;
-            } finally {
-                nhr.disconnect();
-            }
-
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
     }
 }
