@@ -32,9 +32,6 @@ public class ServerLockManager {
         MinecraftClient mc = MinecraftClient.getInstance();
         boolean packChanged = false;
 
-        // MC is not ready
-        if(mc.options == null) return;
-
         for(PackEntry packEntry : Config.getPackEntries()) {
             if(!packEntry.ready) continue;
 
@@ -56,7 +53,7 @@ public class ServerLockManager {
                 mc.options.resourcePacks.remove(packName);
             }
 
-            if(!packApplied && packShouldBeActive) {
+            if(!packApplied && packShouldBeActive && !PackManager.equivPackLoaded(packEntry)) {
                 mc.options.resourcePacks.add(packName);
             }
 

@@ -12,15 +12,17 @@ public class PackEntry {
     public final @Nullable String hash;
     public final @Nullable URL hashUrl;
     public final String name;
+    public final String[] equivPack;
     public boolean ready = false;
     private final String fileName;
 
-    public PackEntry(@Nullable String name, String sourceUrl, @Nullable String hash, @Nullable String hashUrl, String fileName) throws MalformedURLException {
+    public PackEntry(@Nullable String name, String sourceUrl, @Nullable String hash, @Nullable String hashUrl, String fileName, String[] equivPack) throws MalformedURLException {
         if(sourceUrl == null || fileName == null) throw new IllegalArgumentException("sourceURL and fileName must not be null!");
         this.sourceUrl = new URL(sourceUrl);
         this.hash = hash;
         this.hashUrl = hashUrl == null ? null : new URL(hashUrl);
         this.fileName = fileName;
+        this.equivPack = equivPack;
         this.name = name == null ? fileName : name;
     }
 

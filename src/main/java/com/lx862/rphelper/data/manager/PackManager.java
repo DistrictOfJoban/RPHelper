@@ -13,6 +13,7 @@ import net.minecraft.resource.ResourcePackProfile;
 
 import java.io.*;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
@@ -39,6 +40,8 @@ public class PackManager {
                 // Up to date
                 packEntry.ready = true;
                 if(!init) ToastManager.upToDate(packEntry);
+            } else if(equivPackLoaded(packEntry)) {
+                logPackInfo(packEntry, "Equivalent pack loaded, not downloading.");
             } else {
                 // Download
                 CompletableFuture.runAsync(() -> {
@@ -52,6 +55,7 @@ public class PackManager {
             }
         }
     }
+
     public static void downloadPack(PackEntry packEntry, File outputLocation) {
         ToastManager.setupNewDownloadToast(packEntry);
 
@@ -88,6 +92,17 @@ public class PackManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static boolean equivPackLoaded(PackEntry entry) {
+        if(entry.equivPack != null) {
+            for(String pack : MinecraftClient.getInstance().options.resourcePacks) {
+                if(Arrays.asList(entry.equivPack).contains(pack)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public static void loopPack(BiConsumer<PackEntry, ResourcePack> callback) {

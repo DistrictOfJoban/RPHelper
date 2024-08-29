@@ -10,6 +10,5 @@ public class RPHelperClient implements ClientModInitializer {
     public void onInitializeClient() {
         Config.load();
         Packets.registerClient();
-        PackManager.downloadOrUpdate(true);
     }
 }
