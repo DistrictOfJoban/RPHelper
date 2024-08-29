@@ -51,16 +51,33 @@ public class HashManager {
         }
     }
 
+    public static HashComparisonResult compareLocalHash(PackEntry packEntry, File localFile) {
+        if(packEntry.sha1 == null) return HashComparisonResult.NOT_AVAIL;
+
+        String localSha1 = getFileHash(localFile);
+        if(localSha1 == null && localFile.exists()) {
+            PackManager.logPackWarn(packEntry, "Failed to obtain local SHA1, hope pack is up to date?");
+            return HashComparisonResult.MATCH;
+        }
+
+        if(packEntry.sha1.equals(localSha1)) {
+            PackManager.logPackInfo(packEntry, "Hash OK: " + localSha1);
+        } else {
+            PackManager.logPackWarn(packEntry, "Hash Different! Expected: " + packEntry.sha1 + ", Local: " + localSha1);
+        }
+        return packEntry.sha1.equals(localSha1) ? HashComparisonResult.MATCH : HashComparisonResult.MISMATCH;
+    }
+
     public static HashComparisonResult compareRemoteHash(PackEntry packEntry, File localFile) {
         return compareRemoteHash(packEntry, localFile, false);
     }
 
     public static HashComparisonResult compareRemoteHash(PackEntry packEntry, File localFile, boolean ignoreCache) {
-        if(packEntry.hashUrl == null) return HashComparisonResult.NOT_AVAIL;
+        if(packEntry.sha1Url == null) return HashComparisonResult.NOT_AVAIL;
 
         try {
             String cachedRemoteSha1 = getCachedRemoteHash(packEntry);
-            String remoteSha1 = ignoreCache || cachedRemoteSha1 == null ? fetchRemoteHash(packEntry.hashUrl) : cachedRemoteSha1;
+            String remoteSha1 = ignoreCache || cachedRemoteSha1 == null ? fetchRemoteHash(packEntry.sha1Url) : cachedRemoteSha1;
             String localSha1 = getFileHash(localFile);
 
             if(localSha1 == null && localFile.exists()) {
@@ -69,7 +86,7 @@ public class HashManager {
             }
 
             if(remoteSha1 == null) {
-                PackManager.logPackWarn(packEntry, "Cannot obtain remote SHA1 from URL " + packEntry.hashUrl);
+                PackManager.logPackWarn(packEntry, "Cannot obtain remote SHA1 from URL " + packEntry.sha1Url);
                 return HashComparisonResult.NOT_AVAIL;
             }
 
@@ -77,7 +94,7 @@ public class HashManager {
             if(remoteSha1.equals(localSha1)) {
                 PackManager.logPackInfo(packEntry, "Hash OK: " + remoteSha1);
             } else {
-                PackManager.logPackWarn(packEntry, "Hash Different! Remote: " + remoteSha1 + ", Local: " + localSha1);
+                PackManager.logPackWarn(packEntry, "Hash Different! Expected: " + remoteSha1 + ", Local: " + localSha1);
             }
             return remoteSha1.equals(localSha1) ? HashComparisonResult.MATCH : HashComparisonResult.MISMATCH;
         } catch (Exception e) {

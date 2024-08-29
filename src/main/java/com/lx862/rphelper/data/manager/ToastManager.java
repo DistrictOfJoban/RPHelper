@@ -31,12 +31,19 @@ public class ToastManager {
 
     public static void updateDownloadToastProgress(PackEntry packEntry, double progress) {
         ToastWrapper toast = downloadToasts.get(packEntry.uniqueId());
-        if(toast == null || toast.constructed == null) return;
+        if(toast != null) {
+            if(progress >= 1) {
+                downloadToasts.remove(packEntry.uniqueId());
+                queuedToasts.remove(toast);
+            }
 
-        toast.constructed.setContent(
-                Text.translatable("gui.rphelper.rpdownload.title"),
-                Text.translatable("gui.rphelper.rpdownload.description2", packEntry.name, Util.get1DecPlace(progress * 100))
-        );
+            if(toast.constructed != null) {
+                toast.constructed.setContent(
+                        Text.translatable("gui.rphelper.rpdownload.title"),
+                        Text.translatable("gui.rphelper.rpdownload.description2", packEntry.name, Util.get1DecPlace(progress * 100))
+                );
+            }
+        }
     }
 
     public static void upToDate(PackEntry entry) {

@@ -27,7 +27,7 @@ public class ServerLockManager {
         updatePackState(dontReload, false);
     }
 
-    private static void updatePackState(boolean dontReload, boolean forced) {
+    private static void updatePackState(boolean dontReload, boolean forceReload) {
         refreshServerLockList();
         MinecraftClient mc = MinecraftClient.getInstance();
         boolean packChanged = false;
@@ -61,12 +61,12 @@ public class ServerLockManager {
             resourcePackManager.scanPacks();
             mc.options.addResourcePackProfilesToManager(resourcePackManager);
 
-            if(packApplied != packShouldBeActive) {
+            if(packApplied != packShouldBeActive || forceReload) {
                 packChanged = true;
             }
         }
 
-        if((packChanged || forced) && !dontReload) {
+        if(packChanged && !dontReload) {
             MinecraftClient.getInstance().reloadResources();
         }
     }

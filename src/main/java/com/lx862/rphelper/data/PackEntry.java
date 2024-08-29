@@ -9,25 +9,25 @@ import java.util.Objects;
 
 public class PackEntry {
     public final URL sourceUrl;
-    public final @Nullable String hash;
-    public final @Nullable URL hashUrl;
+    public final @Nullable String sha1;
+    public final @Nullable URL sha1Url;
     public final String name;
-    public final String[] equivPack;
+    public final String[] equivPacks;
     public boolean ready = false;
     private final String fileName;
 
-    public PackEntry(@Nullable String name, String sourceUrl, @Nullable String hash, @Nullable String hashUrl, String fileName, String[] equivPack) throws MalformedURLException {
+    public PackEntry(@Nullable String name, String sourceUrl, @Nullable String sha1, @Nullable String sha1Url, String fileName, String[] equivPacks) throws MalformedURLException {
         if(sourceUrl == null || fileName == null) throw new IllegalArgumentException("sourceURL and fileName must not be null!");
         this.sourceUrl = new URL(sourceUrl);
-        this.hash = hash;
-        this.hashUrl = hashUrl == null ? null : new URL(hashUrl);
+        this.sha1 = sha1;
+        this.sha1Url = sha1Url == null ? null : new URL(sha1Url);
         this.fileName = fileName;
-        this.equivPack = equivPack;
+        this.equivPacks = equivPacks;
         this.name = name == null ? fileName : name;
     }
 
     public String uniqueId() {
-        return this.sourceUrl + (this.hashUrl == null ? this.hash : this.hashUrl.toString()) + this.fileName;
+        return this.sourceUrl + (this.sha1Url == null ? this.sha1 : this.sha1Url.toString()) + this.fileName;
     }
 
     public String getFileName() {

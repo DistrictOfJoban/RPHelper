@@ -26,13 +26,13 @@ public class PackManager {
             File packFile = RESOURCE_PACK_LOCATION.resolve(packEntry.getFileName()).toFile();
 
             HashComparisonResult hashResult;
-            if(packEntry.hashUrl != null) {
+            if(packEntry.sha1Url != null) {
                 hashResult = HashManager.compareRemoteHash(packEntry, packFile, true);
             } else {
-                if(packEntry.hash == null) {
+                if(packEntry.sha1 == null) {
                     hashResult = HashComparisonResult.NOT_AVAIL;
                 } else {
-                    hashResult = packEntry.hash.equals(HashManager.getFileHash(packFile)) ? HashComparisonResult.MATCH : HashComparisonResult.MISMATCH;
+                    hashResult = HashManager.compareLocalHash(packEntry, packFile);
                 }
             }
 
@@ -95,9 +95,9 @@ public class PackManager {
     }
 
     public static boolean equivPackLoaded(PackEntry entry) {
-        if(entry.equivPack != null) {
+        if(entry.equivPacks != null) {
             for(String pack : MinecraftClient.getInstance().options.resourcePacks) {
-                if(Arrays.asList(entry.equivPack).contains(pack)) {
+                if(Arrays.asList(entry.equivPacks).contains(pack)) {
                     return true;
                 }
             }
