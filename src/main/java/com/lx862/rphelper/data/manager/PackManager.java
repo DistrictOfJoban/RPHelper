@@ -23,8 +23,12 @@ public class PackManager {
 
     public static void downloadOrUpdate(boolean init) {
         for(PackEntry packEntry : Config.getPackEntries()) {
-            File packFile = RESOURCE_PACK_LOCATION.resolve(packEntry.getFileName()).toFile();
+            if(equivPackLoaded(packEntry)) {
+                logPackInfo(packEntry, "Equivalent pack loaded, not checking.");
+                continue;
+            }
 
+            File packFile = RESOURCE_PACK_LOCATION.resolve(packEntry.getFileName()).toFile();
             HashComparisonResult hashResult;
             if(packEntry.sha1Url != null) {
                 hashResult = HashManager.compareRemoteHash(packEntry, packFile, true);
@@ -40,8 +44,6 @@ public class PackManager {
                 // Up to date
                 packEntry.ready = true;
                 if(!init) ToastManager.upToDate(packEntry);
-            } else if(equivPackLoaded(packEntry)) {
-                logPackInfo(packEntry, "Equivalent pack loaded, not downloading.");
             } else {
                 // Download
                 CompletableFuture.runAsync(() -> {
