@@ -1,10 +1,12 @@
 package com.lx862.rphelper.network;
 
 import com.lx862.rphelper.data.Log;
+import net.minecraft.client.MinecraftClient;
 
 import java.io.*;
 import java.net.*;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -102,14 +104,28 @@ public class DownloadManager {
             }
         }
 
+        httpUrlConnection.disconnect();
+
         // Merge files
         if(successfulSoFar) {
-            Files.deleteIfExists(outputLocation.toPath());
-            mergePartFile(outputLocation, totalParts);
-        }
+            MinecraftClient mc = MinecraftClient.getInstance();
+            List<String> oldPackList = mc.options.resourcePacks;
+            mc.options.resourcePacks.clear();
 
-        cleanupPartFile(outputLocation, totalParts);
-        finishedCallback.accept(successfulSoFar ? null : "Download interrupted!");
-        httpUrlConnection.disconnect();
+            Log.info("Clearing all resource pack");
+            MinecraftClient.getInstance().reloadResources().whenComplete((r, v) -> {
+                try {
+                    Files.deleteIfExists(outputLocation.toPath());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                mergePartFile(outputLocation, totalParts);
+                cleanupPartFile(outputLocation, totalParts);
+                finishedCallback.accept(null);
+                Log.info("Reapplying resource pack");
+                mc.options.resourcePacks.addAll(oldPackList);
+                MinecraftClient.getInstance().reloadResources();
+            });
+        }
     }
 }
