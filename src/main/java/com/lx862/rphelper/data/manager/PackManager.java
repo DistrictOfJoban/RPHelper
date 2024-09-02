@@ -12,9 +12,13 @@ import net.minecraft.resource.ResourcePack;
 import net.minecraft.resource.ResourcePackProfile;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
@@ -60,11 +64,12 @@ public class PackManager {
 
     public static void downloadPack(PackEntry packEntry, File outputLocation) {
         ToastManager.setupNewDownloadToast(packEntry);
+        File tmpOutputLocation = outputLocation.getParentFile().toPath().resolve(UUID.randomUUID().toString()).toFile();
 
         try {
             final long[] lastMs = {System.currentTimeMillis()};
 
-            DownloadManager.download(packEntry.sourceUrl, outputLocation, (prg) -> {
+            DownloadManager.download(packEntry.sourceUrl, tmpOutputLocation, (prg) -> {
                 // Print every 500ms
                 if (System.currentTimeMillis() - lastMs[0] > 500) {
                     lastMs[0] = System.currentTimeMillis();
@@ -73,26 +78,54 @@ public class PackManager {
 
                 ToastManager.updateDownloadToastProgress(packEntry, prg);
             }, (errorMsg) -> {
-                if(errorMsg == null) {
-                    ToastManager.updateDownloadToastProgress(packEntry, 1);
-
-                    if(HashManager.compareRemoteHash(packEntry, outputLocation) == HashComparisonResult.MISMATCH) {
-                        logPackWarn(packEntry, "Resource pack downloaded but the file hash does not match, not applying!");
-                        packEntry.ready = false;
-                        ToastManager.fail(packEntry.name, "Hash Mismatch, file might be corrupted.");
-                    } else {
-                        logPackInfo(packEntry, "Download successful!");
-                        packEntry.ready = true;
-                        ServerLockManager.reloadPackDueToUpdate();
-                    }
-                } else {
+                if(errorMsg != null) {
                     logPackWarn(packEntry, "Failed to download resource pack!");
                     packEntry.ready = false;
                     ToastManager.fail(packEntry.name, errorMsg);
+                    return;
+                }
+
+                MinecraftClient mc = MinecraftClient.getInstance();
+                ToastManager.updateDownloadToastProgress(packEntry, 1);
+
+                if(HashManager.compareRemoteHash(packEntry, tmpOutputLocation) == HashComparisonResult.MISMATCH) {
+                    logPackWarn(packEntry, "Resource pack downloaded but the file hash does not match, not applying!");
+                    packEntry.ready = false;
+                    ToastManager.fail(packEntry.name, "Hash Mismatch, file might be corrupted.");
+                    return;
+                }
+
+                logPackInfo(packEntry, "Download successful!");
+                packEntry.ready = true;
+
+                if(outputLocation.exists()) { // Files on Windows are locked, we have to unload the rp first before replacing
+                    List<String> oldPackList = mc.options.resourcePacks;
+                    mc.options.resourcePacks.clear();
+                    Log.info("Clearing all resource pack");
+
+                    mc.reloadResources().whenComplete((r, v) -> {
+                        try {
+                            Files.deleteIfExists(outputLocation.toPath());
+                            Files.move(tmpOutputLocation.toPath(), outputLocation.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        Log.info("Reapplying resource pack");
+                        mc.options.resourcePacks.addAll(oldPackList);
+                        ServerLockManager.reloadPackDueToUpdate();
+                    });
+                } else {
+                    try {
+                        Files.move(tmpOutputLocation.toPath(), outputLocation.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    ServerLockManager.reloadPackDueToUpdate();
                 }
             });
         } catch (Exception e) {
             e.printStackTrace();
+            ToastManager.fail(packEntry.name, "Please check console for error.");
         }
     }
 

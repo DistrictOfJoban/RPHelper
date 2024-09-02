@@ -1,13 +1,12 @@
 package com.lx862.rphelper.network;
 
 import com.lx862.rphelper.data.Log;
-import net.minecraft.client.MinecraftClient;
 
 import java.io.*;
 import java.net.*;
-import java.nio.file.Files;
-import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class DownloadManager {
@@ -53,8 +52,6 @@ public class DownloadManager {
             finishedCallback.accept("Can't resolve host for URL.");
             return;
         }
-
-
 
         boolean supportsHttpRange = httpUrlConnection.getResponseCode() == 206;
         long totalPackSize = supportsHttpRange ? Long.parseLong(httpUrlConnection.getHeaderField("Content-Range").split("/")[1]) : httpUrlConnection.getContentLength();
@@ -108,24 +105,10 @@ public class DownloadManager {
 
         // Merge files
         if(successfulSoFar) {
-            MinecraftClient mc = MinecraftClient.getInstance();
-            List<String> oldPackList = mc.options.resourcePacks;
-            mc.options.resourcePacks.clear();
-
-            Log.info("Clearing all resource pack");
-            MinecraftClient.getInstance().reloadResources().whenComplete((r, v) -> {
-                try {
-                    Files.deleteIfExists(outputLocation.toPath());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                mergePartFile(outputLocation, totalParts);
-                cleanupPartFile(outputLocation, totalParts);
-                finishedCallback.accept(null);
-                Log.info("Reapplying resource pack");
-                mc.options.resourcePacks.addAll(oldPackList);
-                MinecraftClient.getInstance().reloadResources();
-            });
+            if(outputLocation.exists()) outputLocation.delete();
+            mergePartFile(outputLocation, totalParts);
+            cleanupPartFile(outputLocation, totalParts);
+            finishedCallback.accept(null);
         }
     }
 }
