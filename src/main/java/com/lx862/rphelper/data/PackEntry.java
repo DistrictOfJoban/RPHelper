@@ -8,13 +8,13 @@ import java.nio.file.Paths;
 import java.util.Objects;
 
 public class PackEntry {
+    private final String fileName;
     public final URL sourceUrl;
     public final @Nullable String sha1;
     public final @Nullable URL sha1Url;
     public final String name;
     public final String[] equivPacks;
     public boolean ready = false;
-    private final String fileName;
 
     public PackEntry(@Nullable String name, String sourceUrl, @Nullable String sha1, @Nullable String sha1Url, String fileName, String[] equivPacks) throws MalformedURLException {
         if(sourceUrl == null || fileName == null) throw new IllegalArgumentException("sourceURL and fileName must not be null!");

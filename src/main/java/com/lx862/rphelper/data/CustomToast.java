@@ -15,17 +15,17 @@ public class CustomToast implements Toast {
     private final Identifier backgroundTexture;
     private final Identifier iconTexture;
     private final int iconSize;
-    private int textureWidth;
     private final int configTextureWidth;
     private final int textureHeight;
-    private Text title;
-    private Text description;
-    public long duration;
     private final int titleColor;
     private final int descriptionColor;
+    private int textureWidth;
+    private Text title;
+    private Text description;
+    private long lastElapsed = System.currentTimeMillis();
+    public long duration;
     public long elapsedTime;
     public boolean hidden;
-    private long lastElapsed = System.currentTimeMillis();
 
     public CustomToast(Text title, Text description, long duration, int titleColor, int descriptionColor,
                        Identifier backgroundTexture, Identifier iconTexture, int iconSize, int textureWidth, int textureHeight) {

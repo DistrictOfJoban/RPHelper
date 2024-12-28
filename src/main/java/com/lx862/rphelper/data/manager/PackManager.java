@@ -124,7 +124,7 @@ public class PackManager {
                 }
             });
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.LOGGER.error(e);
             ToastManager.fail(packEntry.name, "Please check console for error.");
         }
     }

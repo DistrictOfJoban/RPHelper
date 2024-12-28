@@ -1,9 +1,6 @@
 package com.lx862.rphelper.mixin;
 
-import com.lx862.rphelper.data.manager.PackManager;
 import com.lx862.rphelper.data.manager.ToastManager;
-import com.lx862.rphelper.config.Config;
-import com.lx862.rphelper.data.PackEntry;
 import net.minecraft.client.gui.screen.TitleScreen;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;

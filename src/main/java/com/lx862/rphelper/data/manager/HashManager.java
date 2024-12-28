@@ -1,6 +1,7 @@
 package com.lx862.rphelper.data.manager;
 
 import com.lx862.rphelper.data.HashComparisonResult;
+import com.lx862.rphelper.data.Log;
 import com.lx862.rphelper.data.PackEntry;
 import com.lx862.rphelper.network.NetworkManager;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -36,7 +37,7 @@ public class HashManager {
         } catch (UnknownHostException e) {
             return null;
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.LOGGER.error(e);
             return null;
         }
     }
@@ -98,7 +99,7 @@ public class HashManager {
             }
             return remoteSha1.equals(localSha1) ? HashComparisonResult.MATCH : HashComparisonResult.MISMATCH;
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.LOGGER.error(e);
         }
         return HashComparisonResult.NOT_AVAIL;
     }

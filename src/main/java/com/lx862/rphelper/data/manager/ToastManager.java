@@ -37,8 +37,8 @@ public class ToastManager {
                 queuedToasts.remove(toast);
             }
 
-            if(toast.constructed != null) {
-                toast.constructed.setContent(
+            if(toast.build != null) {
+                toast.build.setContent(
                         Text.translatable("gui.rphelper.rpdownload.title"),
                         Text.translatable("gui.rphelper.rpdownload.description2", packEntry.name, Util.get1DecPlace(progress * 100))
                 );
@@ -64,7 +64,7 @@ public class ToastManager {
 
     public static ToastWrapper addToast(ToastWrapper toast) {
         if(readyToSendToast) {
-            MinecraftClient.getInstance().getToastManager().add(toast.construct());
+            MinecraftClient.getInstance().getToastManager().add(toast.build());
         } else {
             queuedToasts.add(toast);
         }
@@ -73,7 +73,7 @@ public class ToastManager {
 
     private static void flushToasts() {
         for(ToastWrapper toast : queuedToasts) {
-            MinecraftClient.getInstance().getToastManager().add(toast.construct());
+            MinecraftClient.getInstance().getToastManager().add(toast.build());
         }
         queuedToasts.clear();
     }

@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(OptionsScreen.class)
 public class OptionsScreenMixin {
-    @Inject(method = "refreshResourcePacks", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/GameOptions;write()V"))
+    @Inject(method = "refreshResourcePacks", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/GameOptions;refreshResourcePacks(Lnet/minecraft/resource/ResourcePackManager;)V"))
     public void refreshResourcePacks(ResourcePackManager resourcePackManager, CallbackInfo ci) {
         ServerLockManager.updatePackState(true);
     }

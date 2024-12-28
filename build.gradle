@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.7-SNAPSHOT'
+	id 'fabric-loom' version '1.8-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -77,9 +77,6 @@ publishing {
 	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
 	allprojects {
 		repositories {
-			maven {
-				url = "https://minecraft.guntram.de/maven/"
-			}
 			maven { url 'https://www.jitpack.io' }
 			maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
 		}
