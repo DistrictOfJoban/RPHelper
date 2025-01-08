@@ -45,8 +45,8 @@ public class HashManager {
     public static String getFileHash(File file) {
         if(!file.exists()) return null;
 
-        try {
-            return DigestUtils.sha1Hex(new FileInputStream(file)).trim();
+        try(FileInputStream fis = new FileInputStream(file)) {
+            return DigestUtils.sha1Hex(fis).trim();
         } catch (Exception e) {
             return null;
         }
