@@ -57,6 +57,7 @@ public class ServerLockManager {
 
             if(!packApplied && packShouldBeActive && !PackManager.equivPackLoaded(packEntry)) {
                 mc.options.resourcePacks.add(packName);
+                mc.options.incompatibleResourcePacks.add(packName);
             }
 
             ResourcePackManager resourcePackManager = mc.getResourcePackManager();
