@@ -37,12 +37,10 @@ public class ToastManager {
                 queuedToasts.remove(toast);
             }
 
-            if(toast.build != null) {
-                toast.build.setContent(
-                        Text.translatable("gui.rphelper.rpdownload.title"),
-                        Text.translatable("gui.rphelper.rpdownload.description2", packEntry.name, Util.get1DecPlace(progress * 100))
-                );
-            }
+            toast.setContent(
+                    Text.translatable("gui.rphelper.rpdownload.title"),
+                    Text.translatable("gui.rphelper.rpdownload.description2", packEntry.name, Util.get1DecPlace(progress * 100))
+            );
         }
     }
 

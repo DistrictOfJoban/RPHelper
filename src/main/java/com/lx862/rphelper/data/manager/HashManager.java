@@ -42,6 +42,18 @@ public class HashManager {
         }
     }
 
+    public static HashComparisonResult compareHash(PackEntry packEntry, File localFile, boolean ignoreRemoteCache) {
+        if(packEntry.sha1Url != null) {
+            return HashManager.compareRemoteHash(packEntry, localFile, true);
+        } else {
+            if(packEntry.sha1 == null) {
+                return HashComparisonResult.NOT_AVAIL;
+            } else {
+                return HashManager.compareLocalHash(packEntry, localFile);
+            }
+        }
+    }
+
     public static String getFileHash(File file) {
         if(!file.exists()) return null;
 

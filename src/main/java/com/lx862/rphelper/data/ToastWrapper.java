@@ -7,8 +7,8 @@ import com.lx862.rphelper.config.Config;
 /**
  * This class is a wrapper to a toast, as doing it the regular way would crash if textRenderer is not initialized yet (During launch) */
 public class ToastWrapper {
-    private final Text title;
-    private final Text description;
+    private Text title;
+    private Text description;
     private final boolean error;
     public CustomToast build;
 
@@ -27,5 +27,14 @@ public class ToastWrapper {
             this.build = new CustomToast(title, description, Config.getDuration(), error ? Config.getErrorTitleColor() : Config.getNormalTitleColor(), error ? Config.getErrorDescriptionColor() : Config.getNormalDescriptionColor(), error ? Config.getErrorTexture() : Config.getNormalTexture(), Config.getIconTexture(), Config.getIconSize(), Config.getWidth(), Config.getHeight());
         }
         return build;
+    }
+
+    public void setContent(Text title, Text description) {
+        this.title = title;
+        this.description = description;
+
+        if(this.build != null) {
+            this.build.setContent(title, description);
+        }
     }
 }
