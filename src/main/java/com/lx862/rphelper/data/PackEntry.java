@@ -14,7 +14,7 @@ public class PackEntry {
     public final @Nullable URL sha1Url;
     public final String name;
     public final String[] equivPacks;
-    public boolean ready = false;
+    private boolean ready = false;
 
     public PackEntry(@Nullable String name, String sourceUrl, @Nullable String sha1, @Nullable String sha1Url, String fileName, String[] equivPacks) throws MalformedURLException {
         if(sourceUrl == null || fileName == null) throw new IllegalArgumentException("sourceURL and fileName must not be null!");
@@ -30,8 +30,19 @@ public class PackEntry {
         return this.sourceUrl + (this.sha1Url == null ? this.sha1 : this.sha1Url.toString()) + this.fileName;
     }
 
+    /**
+     * Set whether the pack entry is ready to be used (i.e. Fully downloaded with no issue/Equivalent pack loaded)
+     */
+    public void markReady(boolean ready) {
+        this.ready = ready;
+    }
+
     public String getFileName() {
         return Paths.get(fileName).getFileName().toString();
+    }
+
+    public boolean isReady() {
+        return this.ready;
     }
 
     public void logInfo(String content) {

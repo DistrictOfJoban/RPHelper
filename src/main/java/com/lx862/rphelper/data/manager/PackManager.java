@@ -27,6 +27,7 @@ public class PackManager {
         for(PackEntry packEntry : Config.getPackEntries()) {
             if(equivPackLoaded(packEntry)) {
                 logPackInfo(packEntry, "Equivalent pack loaded, not checking.");
+                packEntry.markReady(true);
                 continue;
             }
 
@@ -35,7 +36,7 @@ public class PackManager {
 
             if (hashResult == HashComparisonResult.MATCH || hashResult == HashComparisonResult.NOT_AVAIL) {
                 // Up to date
-                packEntry.ready = true;
+                packEntry.markReady(true);
                 if(!init) ToastManager.upToDate(packEntry);
             } else {
                 // Download
@@ -64,7 +65,7 @@ public class PackManager {
                         }
                     }
 
-                    if(Config.getPackEntries().stream().allMatch(e -> e.ready)) {
+                    if(Config.getPackEntries().stream().allMatch(e -> e.isReady())) {
                         packDownloaded();
                     }
                 });
@@ -113,7 +114,7 @@ public class PackManager {
             }, (errorMsg) -> {
                 if(errorMsg != null) {
                     logPackWarn(packEntry, "Failed to download resource pack!");
-                    packEntry.ready = false;
+                    packEntry.markReady(false);
                     ToastManager.fail(packEntry.name, errorMsg);
                     return;
                 }
@@ -122,7 +123,7 @@ public class PackManager {
 
                 if(HashManager.compareHash(packEntry, tmpOutputLocation, false) == HashComparisonResult.MISMATCH) {
                     logPackWarn(packEntry, "Resource pack downloaded but the file hash does not match, not applying!");
-                    packEntry.ready = false;
+                    packEntry.markReady(false);
                     ToastManager.fail(packEntry.name, "Hash Mismatch, file might be corrupted.");
 
                     try {
@@ -134,7 +135,7 @@ public class PackManager {
                 }
 
                 logPackInfo(packEntry, "Download successful!");
-                packEntry.ready = true;
+                packEntry.markReady(true);
             });
         } catch (Exception e) {
             Log.LOGGER.error(e);
