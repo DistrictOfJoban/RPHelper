@@ -14,16 +14,18 @@ public class PackEntry {
     public final @Nullable URL sha1Url;
     public final String name;
     public final String[] equivPacks;
+    public final int order;
     private boolean ready = false;
 
-    public PackEntry(@Nullable String name, String sourceUrl, @Nullable String sha1, @Nullable String sha1Url, String fileName, String[] equivPacks) throws MalformedURLException {
+    public PackEntry(@Nullable String name, String sourceUrl, @Nullable String sha1, @Nullable String sha1Url, String fileName, String[] equivPacks, int order) throws MalformedURLException {
         if(sourceUrl == null || fileName == null) throw new IllegalArgumentException("sourceURL and fileName must not be null!");
+        this.name = name == null ? fileName : name;
         this.sourceUrl = new URL(sourceUrl);
         this.sha1 = sha1;
         this.sha1Url = sha1Url == null ? null : new URL(sha1Url);
         this.fileName = fileName;
         this.equivPacks = equivPacks;
-        this.name = name == null ? fileName : name;
+        this.order = order;
     }
 
     public String uniqueId() {

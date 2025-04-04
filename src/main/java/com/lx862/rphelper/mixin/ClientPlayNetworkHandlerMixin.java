@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ClientPlayNetworkHandlerMixin {
     @Inject(method = "onResourcePackSend", at = @At("HEAD"), cancellable = true)
     public void onResourcePackSend(ResourcePackSendS2CPacket packet, CallbackInfo ci) {
+        // Prevent server resource pack prompt if the same is already loaded via RPHelper
         if(Config.havePackEntryWithUrl(packet.getURL())) {
             ci.cancel();
         }

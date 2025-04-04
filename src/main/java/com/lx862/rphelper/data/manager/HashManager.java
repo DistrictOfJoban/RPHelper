@@ -14,20 +14,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 
 public class HashManager {
-    /* Holds the remote hash cache */
-    private static final HashMap<String, String> hashCache = new HashMap<>();
-
-    public static void addHashCache(PackEntry packEntry, String hash) {
-        hashCache.put(packEntry.uniqueId(), hash);
-    }
-
-    public static String getCachedRemoteHash(PackEntry packEntry) {
-        return hashCache.get(packEntry.uniqueId());
-    }
-
     public static String fetchRemoteHash(URL url) throws IOException {
         HttpURLConnection httpUrlConnection = (HttpURLConnection) url.openConnection();
         NetworkManager.setRequestTimeout(httpUrlConnection);
@@ -44,7 +32,7 @@ public class HashManager {
 
     public static HashComparisonResult compareHash(PackEntry packEntry, File localFile, boolean ignoreRemoteCache) {
         if(packEntry.sha1Url != null) {
-            return HashManager.compareRemoteHash(packEntry, localFile, true);
+            return HashManager.compareRemoteHash(packEntry, localFile);
         } else {
             if(packEntry.sha1 == null) {
                 return HashComparisonResult.NOT_AVAIL;
@@ -82,15 +70,10 @@ public class HashManager {
     }
 
     public static HashComparisonResult compareRemoteHash(PackEntry packEntry, File localFile) {
-        return compareRemoteHash(packEntry, localFile, false);
-    }
-
-    public static HashComparisonResult compareRemoteHash(PackEntry packEntry, File localFile, boolean ignoreCache) {
         if(packEntry.sha1Url == null) return HashComparisonResult.NOT_AVAIL;
 
         try {
-            String cachedRemoteSha1 = getCachedRemoteHash(packEntry);
-            String remoteSha1 = ignoreCache || cachedRemoteSha1 == null ? fetchRemoteHash(packEntry.sha1Url) : cachedRemoteSha1;
+            String remoteSha1 = fetchRemoteHash(packEntry.sha1Url);
             String localSha1 = getFileHash(localFile);
 
             if(localSha1 == null && localFile.exists()) {
@@ -103,7 +86,6 @@ public class HashManager {
                 return HashComparisonResult.NOT_AVAIL;
             }
 
-            addHashCache(packEntry, remoteSha1);
             if(remoteSha1.equals(localSha1)) {
                 PackManager.logPackInfo(packEntry, "Hash OK: " + remoteSha1);
             } else {

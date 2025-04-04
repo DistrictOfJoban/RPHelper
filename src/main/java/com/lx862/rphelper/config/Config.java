@@ -148,7 +148,7 @@ public class Config {
     }
 
     public static List<PackEntry> getPackEntries() {
-        return packEntries;
+        return new ArrayList<>(packEntries).stream().sorted((a, b) -> b.order - a.order).toList();
     }
 
     public static int getRequestTimeoutSec() {

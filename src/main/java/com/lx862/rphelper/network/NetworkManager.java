@@ -45,7 +45,7 @@ public class NetworkManager {
                 Log.error("Timed out while downloading!");
                 return false;
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.LOGGER.error("", e);
                 return false;
             } finally {
                 nhr.disconnect();
@@ -53,7 +53,7 @@ public class NetworkManager {
 
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.LOGGER.error("", e);
             return false;
         }
     }

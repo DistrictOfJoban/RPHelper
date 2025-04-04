@@ -1,7 +1,6 @@
 package com.lx862.rphelper;
 
 import com.lx862.rphelper.config.Config;
-import com.lx862.rphelper.data.manager.PackManager;
 import com.lx862.rphelper.network.Packets;
 import net.fabricmc.api.ClientModInitializer;
 

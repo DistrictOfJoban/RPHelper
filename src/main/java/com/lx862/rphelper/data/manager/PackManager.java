@@ -8,8 +8,6 @@ import com.lx862.rphelper.data.PackEntry;
 import com.lx862.rphelper.network.DownloadManager;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.resource.ResourcePack;
-import net.minecraft.resource.ResourcePackProfile;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -17,7 +15,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
 
 public class PackManager {
     public static final Path RESOURCE_PACK_LOCATION = FabricLoader.getInstance().getGameDir().resolve("resourcepacks");
@@ -65,7 +62,7 @@ public class PackManager {
                         }
                     }
 
-                    if(Config.getPackEntries().stream().allMatch(e -> e.isReady())) {
+                    if(Config.getPackEntries().stream().allMatch(PackEntry::isReady)) {
                         packDownloaded();
                     }
                 });
@@ -76,7 +73,6 @@ public class PackManager {
     private static void packDownloaded() {
         MinecraftClient mc = MinecraftClient.getInstance();
         if(!unloadCallback.isEmpty()) {
-            List<String> oldPackList = mc.options.resourcePacks;
             MinecraftClient.getInstance().options.resourcePacks.clear();
             Log.info("Clearing all resource pack");
 
@@ -85,14 +81,13 @@ public class PackManager {
             }
             unloadCallback.clear();
 
-            Log.info("Reapplying resource pack");
             mc.reloadResources().whenComplete((r, v) -> {
-                mc.options.resourcePacks.addAll(oldPackList);
-                ServerLockManager.reloadPackDueToUpdate();
+                Log.info("Reapplying resource pack");
+                PackApplicationManager.reloadPackDueToUpdate();
             });
         } else {
             Log.info("Reloading resource pack");
-            ServerLockManager.reloadPackDueToUpdate();
+            PackApplicationManager.reloadPackDueToUpdate();
         }
     }
 
@@ -153,20 +148,6 @@ public class PackManager {
             }
         }
         return false;
-    }
-
-    public static void loopPack(BiConsumer<PackEntry, ResourcePack> callback) {
-        Collection<ResourcePackProfile> profiles = MinecraftClient.getInstance().getResourcePackManager().getProfiles();
-        for(ResourcePackProfile resourcePackProfile : profiles) {
-            PackEntry entry = Config.getPackEntry(resourcePackProfile.getName());
-            if(entry == null) {
-                continue;
-            }
-
-            try (ResourcePack rp = resourcePackProfile.createResourcePack()) {
-                callback.accept(entry, rp);
-            }
-        }
     }
 
     public static void logPackInfo(PackEntry entry, String content) {
