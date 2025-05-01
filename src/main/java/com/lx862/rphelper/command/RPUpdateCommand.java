@@ -1,12 +1,9 @@
 package com.lx862.rphelper.command;
 
-import com.lx862.rphelper.network.Packets;
+import com.lx862.rphelper.packet.ResourcePackSyncPacket;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.context.CommandContext;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.command.argument.EntityArgumentType;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -32,8 +29,7 @@ public class RPUpdateCommand {
     }
 
     private static int sendUpdateRequestToPlayer(ServerPlayerEntity player) {
-        PacketByteBuf buf = PacketByteBufs.create();
-        ServerPlayNetworking.send(player, Packets.SEND_UPDATE_RP, buf);
+        ServerPlayNetworking.send(player, new ResourcePackSyncPacket(false));
         return 1;
     }
 }

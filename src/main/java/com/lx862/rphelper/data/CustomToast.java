@@ -1,9 +1,9 @@
 package com.lx862.rphelper.data;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.toast.Toast;
 import net.minecraft.client.toast.ToastManager;
 import net.minecraft.client.util.math.MatrixStack;
@@ -45,21 +45,23 @@ public class CustomToast implements Toast {
     }
 
     @Override
-    public Visibility draw(MatrixStack matrices, ToastManager manager, long currentTime) {  
-        RenderSystem.setShaderTexture(0, backgroundTexture);
-        DrawableHelper.drawTexture(matrices, 0, 0, 0, 0, getWidth(), textureHeight, textureWidth, textureHeight);
+    public Visibility draw(DrawContext context, ToastManager manager, long startTime) {
+        final MatrixStack matrices = context.getMatrices();
+//        RenderSystem.setShaderTexture(0, backgroundTexture);
+        context.drawTexture(backgroundTexture, 0, 0, 0, 0, getWidth(), textureHeight, textureWidth, textureHeight);
 
-        RenderSystem.setShaderTexture(0, iconTexture);
-        DrawableHelper.drawTexture(matrices, 10, (textureHeight - iconSize) / 2, 0, 0, iconSize, iconSize, iconSize, iconSize);
-    
-        manager.getClient().textRenderer.draw(matrices, this.title, 44, 7, this.titleColor);
-        manager.getClient().textRenderer.draw(matrices, this.description, 44, 18, this.descriptionColor);
+//        RenderSystem.setShaderTexture(0, iconTexture);
+        context.drawTexture(iconTexture, 10, (textureHeight - iconSize) / 2, 0, 0, iconSize, iconSize, iconSize, iconSize);
+
+
+        context.drawText(MinecraftClient.getInstance().textRenderer, this.title, 44, 7, this.titleColor, false);
+        context.drawText(MinecraftClient.getInstance().textRenderer, this.description, 44, 18, this.descriptionColor, false);
 
         elapsedTime += System.currentTimeMillis() - lastElapsed;
         lastElapsed = System.currentTimeMillis();
 
         return elapsedTime >= duration ? Visibility.HIDE : Visibility.SHOW;
-    }  
+    }
 
     @Override
     public int getWidth() {

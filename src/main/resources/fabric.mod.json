@@ -13,7 +13,6 @@
     "homepage": "",
     "sources": "https://github.com/DistrictOfJoban/RPHelper"
   },
-
   "license": "MIT",
   "icon": "assets/rphelper/icon.png",
 
@@ -30,6 +29,6 @@
     "rphelper.mixin.json"
   ],
   "depends": {
-    "minecraft": ">=1.19.4"
+    "minecraft": ">=1.21"
   }
 }

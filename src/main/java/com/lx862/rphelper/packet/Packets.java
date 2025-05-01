@@ -1,11 +1,10 @@
-package com.lx862.rphelper.network;
+package com.lx862.rphelper.packet;
 
 import com.lx862.rphelper.RPHelper;
 import com.lx862.rphelper.data.Log;
 import com.lx862.rphelper.data.manager.PackManager;
-import com.lx862.rphelper.data.manager.PackApplicationManager;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
 
 import java.util.concurrent.CompletableFuture;
@@ -21,9 +20,8 @@ public class Packets {
 //            });
 //        });
 
-        ClientPlayNetworking.registerGlobalReceiver(SEND_UPDATE_RP, (client, handler, buf, responseSender) -> {
-            client.execute(() -> {
-                if(client.player == null) return;
+        ClientPlayNetworking.registerGlobalReceiver(ResourcePackSyncPacket.ID, (payload, context) -> {
+            MinecraftClient.getInstance().execute(() -> {
                 Log.info("Received pack update request from server.");
 
                 CompletableFuture.runAsync(() -> {
