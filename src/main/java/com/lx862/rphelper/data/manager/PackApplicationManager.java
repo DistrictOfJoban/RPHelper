@@ -26,6 +26,7 @@ public class PackApplicationManager {
         for(PackEntry packEntry : Config.getPackEntries()) {
             String packName = "file/" + packEntry.getFileName();
             mc.options.resourcePacks.remove(packName);
+            mc.options.incompatibleResourcePacks.remove(packName);
         }
 
         List<PackEntry> sortedEntries = new ArrayList<>(Config.getPackEntries());
@@ -39,6 +40,7 @@ public class PackApplicationManager {
 
             if(!packApplied && !PackManager.equivPackLoaded(packEntry)) {
                 mc.options.resourcePacks.add(packName);
+                mc.options.incompatibleResourcePacks.add(packName);
             }
 
             ResourcePackManager resourcePackManager = mc.getResourcePackManager();
