@@ -141,7 +141,7 @@ public class PackManager {
 
     public static boolean equivPackExists(PackEntry entry) {
         if(entry.equivPacks != null) {
-            for(File file : MinecraftClient.getInstance().getResourcePackDir().toFile().listFiles()) {
+            for(File file : RESOURCE_PACK_LOCATION.toFile().listFiles()) {
                 if (file.isDirectory() && Arrays.asList(entry.equivPacks).contains("file/" + file.getName())) {
                     return true;
                 }
