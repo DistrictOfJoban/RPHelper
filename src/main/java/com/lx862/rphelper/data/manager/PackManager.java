@@ -22,7 +22,7 @@ public class PackManager {
 
     public static void downloadOrUpdate(boolean init) {
         for(PackEntry packEntry : Config.getPackEntries()) {
-            if(equivPackLoaded(packEntry)) {
+            if(equivPackExists(packEntry)) {
                 logPackInfo(packEntry, "Equivalent pack loaded, not checking.");
                 packEntry.markReady(true);
                 continue;
@@ -139,10 +139,10 @@ public class PackManager {
         return tmpOutputLocation;
     }
 
-    public static boolean equivPackLoaded(PackEntry entry) {
+    public static boolean equivPackExists(PackEntry entry) {
         if(entry.equivPacks != null) {
-            for(String pack : MinecraftClient.getInstance().options.resourcePacks) {
-                if(Arrays.asList(entry.equivPacks).contains(pack)) {
+            for(File file : MinecraftClient.getInstance().getResourcePackDir().toFile().listFiles()) {
+                if (file.isDirectory() && Arrays.asList(entry.equivPacks).contains("file/" + file.getName())) {
                     return true;
                 }
             }

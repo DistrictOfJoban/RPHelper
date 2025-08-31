@@ -38,7 +38,7 @@ public class PackApplicationManager {
             String packName = "file/" + packEntry.getFileName();
             boolean packApplied = mc.options.resourcePacks.contains(packName);
 
-            if(!packApplied && !PackManager.equivPackLoaded(packEntry)) {
+            if(!packApplied && !PackManager.equivPackExists(packEntry)) {
                 mc.options.resourcePacks.add(packName);
                 mc.options.incompatibleResourcePacks.add(packName);
             }
