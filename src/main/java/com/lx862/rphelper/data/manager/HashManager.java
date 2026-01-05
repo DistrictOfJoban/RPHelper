@@ -21,14 +21,14 @@ public class HashManager {
         NetworkManager.setRequestTimeout(httpUrlConnection);
 
         try {
-            String str = IOUtils.toString(httpUrlConnection.getInputStream(), StandardCharsets.UTF_8).trim();
-            httpUrlConnection.disconnect();
-            return str;
+            return IOUtils.toString(httpUrlConnection.getInputStream(), StandardCharsets.UTF_8).trim();
         } catch (UnknownHostException e) {
             return null;
         } catch (IOException e) {
             Log.LOGGER.error(e);
             return null;
+        } finally {
+            httpUrlConnection.disconnect();
         }
     }
 
