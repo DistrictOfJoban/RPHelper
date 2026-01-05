@@ -21,7 +21,9 @@ public class HashManager {
         NetworkManager.setRequestTimeout(httpUrlConnection);
 
         try {
-            return IOUtils.toString(httpUrlConnection.getInputStream(), StandardCharsets.UTF_8).trim();
+            String str = IOUtils.toString(httpUrlConnection.getInputStream(), StandardCharsets.UTF_8).trim();
+            httpUrlConnection.disconnect();
+            return str;
         } catch (UnknownHostException e) {
             return null;
         } catch (IOException e) {
