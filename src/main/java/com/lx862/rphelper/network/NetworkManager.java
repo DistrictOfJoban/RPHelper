@@ -24,7 +24,8 @@ public class NetworkManager {
 
         try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(outputFile))) {
             HttpURLConnection nhr = (HttpURLConnection) url.openConnection();
-            NetworkManager.setRequestTimeout(nhr);
+            nhr.setReadTimeout(30 * 1000);
+            nhr.setConnectTimeout(30 * 1000);
 
             // Http Range Support
             boolean supportRange = byteOffset != -1;

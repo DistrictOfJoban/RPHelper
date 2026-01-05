@@ -14,6 +14,6 @@ public class MinecraftMixin {
     @Inject(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/resource/ResourcePackManager;createResourcePacks()Ljava/util/List;"))
     public void reloadResources(RunArgs args, CallbackInfo ci) {
         PackManager.downloadOrUpdate(true);
-        PackApplicationManager.updatePackState(true);
+        PackApplicationManager.refreshPackState();
     }
 }

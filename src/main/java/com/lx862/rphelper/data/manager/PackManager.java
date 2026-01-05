@@ -21,6 +21,8 @@ public class PackManager {
     private static final List<Runnable> unloadCallback = new ArrayList<>();
 
     public static void downloadOrUpdate(boolean init) {
+        List<PackEntry> packsToBeDownloaded = new ArrayList<>();
+
         for(PackEntry packEntry : Config.getPackEntries()) {
             if(equivPackExists(packEntry)) {
                 logPackInfo(packEntry, "Equivalent pack loaded, not checking.");
@@ -36,37 +38,43 @@ public class PackManager {
                 packEntry.markReady(true);
                 if(!init) ToastManager.upToDate(packEntry);
             } else {
-                // Download
-                CompletableFuture.runAsync(() -> {
-                    logPackInfo(packEntry, "Will be downloaded.");
+                packsToBeDownloaded.add(packEntry);
+            }
+        }
 
-                    long curTime = System.currentTimeMillis();
-                    File downloadedLocation = downloadPack(packEntry, packFile);
-                    long timeDiff = System.currentTimeMillis() - curTime;
-                    logPackInfo(packEntry, "Took " + (timeDiff / 1000.0) + "s");
+        for(PackEntry packEntry : packsToBeDownloaded) {
+            File packFile = RESOURCE_PACK_LOCATION.resolve(packEntry.getFileName()).toFile();
 
-                    if(packFile.exists()) { // Files on Windows are locked, we have to unload the rp first before replacing
-                        unloadCallback.add(() -> {
-                            try {
-                                Files.deleteIfExists(packFile.toPath());
-                                Files.move(downloadedLocation.toPath(), packFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                        });
-                    } else {
+            // Download
+            CompletableFuture.runAsync(() -> {
+                logPackInfo(packEntry, "Will be downloaded.");
+
+                long curTime = System.currentTimeMillis();
+                File downloadedLocation = downloadPack(packEntry, packFile);
+                long timeDiff = System.currentTimeMillis() - curTime;
+                logPackInfo(packEntry, "Took " + (timeDiff / 1000.0) + "s");
+
+                if(packFile.exists()) { // Files on Windows are locked, we have to unload the rp first before replacing
+                    unloadCallback.add(() -> {
                         try {
+                            Files.deleteIfExists(packFile.toPath());
                             Files.move(downloadedLocation.toPath(), packFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
+                    });
+                } else {
+                    try {
+                        Files.move(downloadedLocation.toPath(), packFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
                     }
+                }
 
-                    if(Config.getPackEntries().stream().allMatch(PackEntry::isReady)) {
-                        packDownloaded();
-                    }
-                });
-            }
+                if(Config.getPackEntries().stream().allMatch(PackEntry::isReady)) {
+                    packDownloaded();
+                }
+            });
         }
     }
 

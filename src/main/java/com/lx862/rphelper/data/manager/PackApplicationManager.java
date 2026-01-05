@@ -11,14 +11,14 @@ import java.util.List;
 
 public class PackApplicationManager {
     public static void reloadPackDueToUpdate() {
-        updatePackState(false, true);
+        updatePackState(ReloadType.ALWAYS);
     }
 
-    public static void updatePackState(boolean dontReload) {
-        updatePackState(dontReload, false);
+    public static void refreshPackState() {
+        updatePackState(ReloadType.NEVER);
     }
 
-    private static void updatePackState(boolean dontReload, boolean forceReload) {
+    private static void updatePackState(ReloadType reloadType) {
         MinecraftClient mc = MinecraftClient.getInstance();
 
         List<String> oldPacks = new ArrayList<>(mc.options.resourcePacks);
@@ -50,8 +50,14 @@ public class PackApplicationManager {
 
         boolean packChanged = oldPacks.containsAll(mc.options.resourcePacks) && mc.options.resourcePacks.containsAll(oldPacks);
 
-        if(!dontReload && (packChanged || forceReload)) {
+        if((packChanged && reloadType == ReloadType.ON_CHANGED) || reloadType == ReloadType.ALWAYS) {
             MinecraftClient.getInstance().reloadResources();
         }
+    }
+
+    public enum ReloadType {
+        NEVER,
+        ON_CHANGED,
+        ALWAYS
     }
 }
